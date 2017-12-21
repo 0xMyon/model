@@ -16,8 +16,10 @@ public interface ComplementType extends Type {
 			public String toString() {
 				return "!"+complement.toString();
 			}
+			
 		};
 	}
+
 	
 
 	@Override

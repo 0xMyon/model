@@ -14,20 +14,24 @@ public interface Application extends Thing {
 	
 	
 	static Application create(Function function, Thing parameter) {
-		return new Application() {
-			@Override
-			public @NonNull Thing parameter() {
-				return parameter;
-			}
-			
-			@Override
-			public @NonNull Function function() {
-				return function;
-			}
-			public String toString() {
-				return function().toString()+"("+parameter().toString()+")";
-			}
-		};
+		if (function.typeof().domain().containsAll(parameter.typeof())) {
+			return new Application() {
+				@Override
+				public @NonNull Thing parameter() {
+					return parameter;
+				}
+				
+				@Override
+				public @NonNull Function function() {
+					return function;
+				}
+				public String toString() {
+					return function().toString()+"("+parameter().toString()+")";
+				}
+			};
+		} else {
+			return Nothing.create("");
+		}
 	}
 	
 

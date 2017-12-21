@@ -23,7 +23,6 @@ public interface Type extends Thing {
 	
 	@Override
 	@NonNull Type evaluate();
-	
 
 	
 }
