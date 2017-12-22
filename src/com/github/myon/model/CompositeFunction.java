@@ -30,8 +30,15 @@ public interface CompositeFunction extends Function {
 		return Stream.of(elements()).anyMatch(Function::isEvaluable);
 	}
 	
+
 	@Override
-	public default FunctionType typeof() {
+	public default Type domain() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public default Type codomain() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -43,7 +50,7 @@ public interface CompositeFunction extends Function {
 	}
 	
 	@Override
-	public default Type apply(@NonNull Type parameter) {
+	public default Type codomain(@NonNull Type parameter) {
 		// TODO Auto-generated method stub
 		return null;
 	}

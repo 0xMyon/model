@@ -1,11 +1,9 @@
 package com.github.myon.model.function;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import com.github.myon.model.ComplementType;
 import com.github.myon.model.MetaType;
-import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
+import com.github.myon.model.Void;
 
 public interface SystemType extends Type {
 
@@ -19,18 +17,9 @@ public interface SystemType extends Type {
 		return this;
 	}
 	
-	static final SystemType NOTHING = new SystemType() {
-		@Override
-		public boolean contains(@NonNull Thing thing) {
-			return false;
-		}
-		@Override
-		public String toString() {
-			return "0";
-		}
-	};
+	static final Type VOID = Void.INSTANCE;
 	
-	static final Type ANYTHING = ComplementType.create(NOTHING);
+	static final Type ANYTHING = ComplementType.create(VOID);
 	
 	static final Type TYPE = MetaType.create(ANYTHING);
 	

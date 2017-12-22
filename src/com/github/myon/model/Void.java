@@ -40,5 +40,15 @@ public interface Void extends FunctionType, MetaType {
 	default boolean contains(@NonNull Thing thing) {
 		return thing instanceof Nothing;
 	}
+	
+	@Override
+	public default boolean containsAll(Type type) {
+		return type instanceof Void;
+	}
+
+	@Override
+	public default boolean intersetcs(Type type) {
+		return true;
+	}
 
 }

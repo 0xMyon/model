@@ -25,4 +25,9 @@ public interface Type extends Thing {
 	@NonNull Type evaluate();
 
 	
+	boolean containsAll(Type type);
+
+	boolean intersetcs(Type type);
+
+	
 }

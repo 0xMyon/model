@@ -6,7 +6,7 @@ public interface MetaType extends Type {
 
 	Type base();
 	
-	static MetaType create(Type base) {
+	static @NonNull MetaType create(Type base) {
 		return new MetaType() {
 			@Override
 			public Type base() {
@@ -32,6 +32,22 @@ public interface MetaType extends Type {
 	
 	@Override
 	public default boolean contains(@NonNull Thing thing) {
+		if (thing instanceof Type) {
+			Type type = (Type) thing;
+			return base().containsAll(type);
+		}
+		return false;
+	}
+	
+	@Override
+	public default boolean containsAll(Type type) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public default boolean intersetcs(Type type) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 	

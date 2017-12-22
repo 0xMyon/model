@@ -15,7 +15,7 @@ public interface Nothing extends Application, Function, Void {
 			}
 			@Override
 			public String toString() {
-				return "ยง("+what+")";
+				return "ง("+what+")";
 			}
 		};
 	}
@@ -51,7 +51,7 @@ public interface Nothing extends Application, Function, Void {
 	}
 
 	@Override
-	public default Type apply(@NonNull Type parameter) {
+	public default Type codomain(@NonNull Type parameter) {
 		return create("called");
 	}
 
@@ -59,6 +59,18 @@ public interface Nothing extends Application, Function, Void {
 	@Override
 	default boolean isEvaluable() {
 		return false;
+	}
+
+
+	@Override
+	default Type domain() {
+		return create("called");
+	}
+
+
+	@Override
+	default Type codomain() {
+		return create("called");
 	}
 	
 }

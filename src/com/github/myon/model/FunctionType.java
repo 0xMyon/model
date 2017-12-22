@@ -42,4 +42,22 @@ public interface FunctionType extends Type {
 		return false;
 	}
 	
+	@Override
+	public default boolean containsAll(Type type) {
+		if (type instanceof FunctionType) {
+			FunctionType ft = (FunctionType) type;
+			return domain().containsAll(ft.domain()) && codomain().containsAll(ft.codomain());
+		}
+		return false;
+	}
+	
+	@Override
+	public default boolean intersetcs(Type type) {
+		if (type instanceof FunctionType) {
+			FunctionType ft = (FunctionType) type;
+			return domain().intersetcs(ft.domain()) && codomain().intersetcs(ft.codomain());
+		}
+		return false;
+	}
+	
 }

@@ -2,6 +2,7 @@ package com.github.myon.model;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+
 public interface Function extends Thing {
 
 	/**
@@ -11,9 +12,15 @@ public interface Function extends Thing {
 	 */
 	Thing apply(@NonNull Thing parameter);
 	
-	Type apply(@NonNull Type parameter);
+	Type domain();
+	Type codomain();
 	
-	FunctionType typeof();
+	Type codomain(@NonNull Type parameter);
+	
+	@Override
+	public default FunctionType typeof() {
+		return FunctionType.create(domain(), codomain());
+	}
 	
 	@Override
 	@NonNull Function evaluate();
