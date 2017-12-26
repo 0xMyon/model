@@ -21,6 +21,12 @@ public interface SystemFunction extends Function {
 	public default SystemFunction evaluate() {
 		return this;
 	}
+	
+	@Override
+	public default <T> T accept(Visitor<T> visitor) {
+		return visitor.handle(this);
+	}
+	
 
 	SystemFunction TYPEOF = new SystemFunction() {
 		@Override
@@ -39,6 +45,7 @@ public interface SystemFunction extends Function {
 		public Type domain() {
 			return SystemType.ANYTHING;
 		}
+		
 	};
 
 	SystemFunction DOMAIN = new SystemFunction() {
@@ -58,7 +65,7 @@ public interface SystemFunction extends Function {
 			if (parameter instanceof FunctionType) {
 				return ((FunctionType)parameter).domain();
 			}
-			return Nothing.create("expected FunctionType");
+			return Nothing.of("expected FunctionType");
 		}
 
 
@@ -67,15 +74,10 @@ public interface SystemFunction extends Function {
 			if (parameter instanceof Function) {
 				return ((Function)parameter).domain();
 			}
-			return Nothing.create("expected Function");
+			return Nothing.of("expected Function");
 		}
 	};
 
-
-	@Override
-	public default Type codomain() {
-		return codomain(domain());
-	}
 
 	SystemFunction CONTAINS = new SystemFunction() {
 
@@ -104,7 +106,7 @@ public interface SystemFunction extends Function {
 					return Product.create();
 				}
 			}
-			return Nothing.create("invalid argument");
+			return Nothing.of("invalid argument");
 		}
 
 		@Override

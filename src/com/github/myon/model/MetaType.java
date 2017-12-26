@@ -2,6 +2,8 @@ package com.github.myon.model;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.sun.prism.es2.ES2Pipeline;
+
 public interface MetaType extends Type {
 
 	Type base();
@@ -15,6 +17,10 @@ public interface MetaType extends Type {
 			@Override
 			public String toString() {
 				return "#"+base().toString();
+			}
+			@Override
+			public <T> T accept(Visitor<T> visitor) {
+				return visitor.handle(this);
 			}
 		};
 	}
@@ -31,24 +37,61 @@ public interface MetaType extends Type {
 	}
 	
 	@Override
-	public default boolean contains(@NonNull Thing thing) {
-		if (thing instanceof Type) {
-			Type type = (Type) thing;
-			return base().containsAll(type);
-		}
-		return false;
+	public default Epsilon contains(@NonNull Thing thing) {
+		return thing.accept(new Thing.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Thing that) {
+				return Nothing.TypeMiss(MetaType.this, thing);
+			}
+			@Override
+			public Epsilon handle(Type that) {
+				return base().containsAll(that);
+			}
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Epsilon.INSTANCE;
+			}
+		});
 	}
 	
 	@Override
-	public default boolean containsAll(Type type) {
-		// TODO Auto-generated method stub
-		return false;
+	public default Epsilon containsAll(Type type) {
+		return type.accept(new Type.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Nothing.of("Not a Type");
+			}
+			@Override
+			public Epsilon handle(Type that) {
+				return Nothing.of("undefined");
+			}
+			@Override
+			public Epsilon handle(MetaType that) {
+				return base().containsAll(that.base());
+			}
+		});
 	}
 	
 	@Override
-	public default boolean intersetcs(Type type) {
-		// TODO Auto-generated method stub
-		return false;
+	public default Epsilon intersetcs(Type type) {
+		return type.accept(new Type.Visitor<Epsilon>() {
+
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Nothing.of("no type");
+			}
+
+			@Override
+			public Epsilon handle(Type that) {
+				return Nothing.of(MetaType.this.toString()+" does not intersetcs "+that.toString());
+			}
+			
+			@Override
+			public Epsilon handle(MetaType that) {
+				return base().intersetcs(that.base());
+			}
+		
+		});
 	}
 	
 }

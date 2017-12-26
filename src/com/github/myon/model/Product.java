@@ -20,6 +20,11 @@ public interface Product extends Thing {
 			public String toString() {
 				return "("+Stream.of(factors).map(Object::toString).reduce((a,b)->a+","+b).orElse("")+")";
 			}
+			@Override
+			public <T> T accept(Visitor<T> visitor) {
+				return visitor.handle(this);
+			}
+			
 		};
 		}
 	}
@@ -27,8 +32,8 @@ public interface Product extends Thing {
 	@NonNull Thing[] factors();
 
 	@Override
-	public default @NonNull ProductType typeof() {
-		return null;
+	public default @NonNull Type typeof() {
+		return ProductType.create(Stream.of(factors()).map(Thing::typeof).toArray(Type[]::new));
 	}
 
 	@Override

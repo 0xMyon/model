@@ -2,6 +2,8 @@ package com.github.myon.model;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.github.myon.model.Thing.Visitor;
+
 public interface FunctionType extends Type {
 
 	Type domain();
@@ -21,6 +23,10 @@ public interface FunctionType extends Type {
 			public String toString() {
 				return domain().toString()+"->"+codomain.toString();
 			}
+			@Override
+			public <T> T accept(Visitor<T> visitor) {
+				return visitor.handle(this);
+			}
 		};
 	}
 	
@@ -37,27 +43,66 @@ public interface FunctionType extends Type {
 	}
 	
 	@Override
-	public default boolean contains(@NonNull Thing thing) {
-		// TODO Auto-generated method stub
-		return false;
+	public default Epsilon contains(@NonNull Thing thing) {
+		return thing.accept(new Thing.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Epsilon.INSTANCE;
+			}
+			@Override
+			public Epsilon handle(Thing that) {
+				return Nothing.of(that.toString()+" is no instance of "+FunctionType.this.toString());
+			}
+			@Override
+			public Epsilon handle(Function that) {
+				return Epsilon.conjunction(
+						domain().containsAll(that.domain()),
+						codomain().containsAll(that.codomain())
+						);
+			}
+		});
 	}
 	
 	@Override
-	public default boolean containsAll(Type type) {
-		if (type instanceof FunctionType) {
-			FunctionType ft = (FunctionType) type;
-			return domain().containsAll(ft.domain()) && codomain().containsAll(ft.codomain());
-		}
-		return false;
+	public default Epsilon containsAll(Type type) {
+		return type.accept(new Type.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Nothing.of("Not a type");
+			}
+			@Override
+			public Epsilon handle(Type that) {
+				return Nothing.of("Not a function type");
+			}
+			@Override
+			public Epsilon handle(FunctionType that) {
+				return Epsilon.conjunction(
+						domain().containsAll(that.domain()),
+						codomain().containsAll(that.codomain())
+						);
+			}
+		});
 	}
 	
 	@Override
-	public default boolean intersetcs(Type type) {
-		if (type instanceof FunctionType) {
-			FunctionType ft = (FunctionType) type;
-			return domain().intersetcs(ft.domain()) && codomain().intersetcs(ft.codomain());
-		}
-		return false;
+	public default Epsilon intersetcs(Type type) {
+		return type.accept(new Type.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Epsilon.INSTANCE;
+			}
+			@Override
+			public Epsilon handle(Type that) {
+				return Nothing.of(that.toString()+" doeas not intersects "+FunctionType.this.toString());
+			}
+			@Override
+			public Epsilon handle(FunctionType that) {
+				return Epsilon.conjunction(
+						domain().intersetcs(that.domain()),
+						codomain().intersetcs(that.codomain())
+						);
+			}
+		});
 	}
 	
 }

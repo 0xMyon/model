@@ -2,28 +2,39 @@ package com.github.myon.model;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-public interface Void extends FunctionType, MetaType {
+import com.github.myon.model.Thing.Visitor;
+
+public interface Void extends FunctionType, MetaType, ProductType {
 
 	Void INSTANCE = new Void() {
 		@Override
 		public String toString() {
 			return "{}";
 		}
+		@Override
+		public <T> T accept(Visitor<T> visitor) {
+			return visitor.handle(this);
+		}
 	};
 	
 	@Override
+	public default Type[] factors() {
+		return new Type[0];
+	}
+	
+	@Override
 	public default Nothing base() {
-		return Nothing.create("undefined");
+		return Nothing.of("undefined");
 	}
 	
 	@Override
 	public default Type domain() {
-		return Nothing.create("undefined");
+		return Nothing.of("undefined");
 	}
 	
 	@Override
 	public default Type codomain() {
-		return Nothing.create("undefined");
+		return Nothing.of("undefined");
 	}
 
 	@Override
@@ -37,18 +48,40 @@ public interface Void extends FunctionType, MetaType {
 	}
 
 	@Override
-	default boolean contains(@NonNull Thing thing) {
-		return thing instanceof Nothing;
+	default Epsilon contains(@NonNull Thing thing) {
+		return thing.accept(new Thing.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Thing that) {
+				return Nothing.TypeMiss(Void.this, that);
+			}
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Epsilon.INSTANCE;
+			}
+		});
 	}
 	
 	@Override
-	public default boolean containsAll(Type type) {
-		return type instanceof Void;
+	public default Epsilon containsAll(Type type) {
+		return type.accept(new Type.Visitor<Epsilon>(){
+			@Override
+			public Epsilon handle(Type that) {
+				return Nothing.of(that.toString()+" is not empty");
+			}
+			@Override
+			public Epsilon handle(Void that) {
+				return Epsilon.INSTANCE;
+			}
+			@Override
+			public Epsilon handle(Nothing that) {
+				return Nothing.of(that.toString()+" is not a type");
+			}			
+		});
 	}
 
 	@Override
-	public default boolean intersetcs(Type type) {
-		return true;
+	public default Epsilon intersetcs(Type type) {
+		return Nothing.of("no intersection");
 	}
 
 }

@@ -14,25 +14,39 @@ public interface Application extends Thing {
 
 
 	static Application create(final Function function, final Thing parameter) {
-		//if (function.typeof().domain().containsAll(parameter.typeof())) {
-		return new Application() {
+		return function.typeof().domain().containsAll(parameter.typeof()).accept(new Epsilon.Visitor<Application>() {
+
 			@Override
-			public @NonNull Thing parameter() {
-				return parameter;
+			public Application handle(Nothing cause) {
+				return Nothing.of("Type missmatch "+function.typeof().domain().toString()+" !>>> "+parameter.typeof().toString(), cause);
 			}
 
 			@Override
-			public @NonNull Function function() {
-				return function;
+			public Application handle(Epsilon that) {
+				return new Application() {
+					@Override
+					public @NonNull Thing parameter() {
+						return parameter;
+					}
+		
+					@Override
+					public @NonNull Function function() {
+						return function;
+					}
+					@Override
+					public String toString() {
+						return function().toString()+"("+parameter().toString()+")";
+					}
+
+					@Override
+					public <T> T accept(Visitor<T> visitor) {
+						return visitor.handle(this);
+					}
+				};
 			}
-			@Override
-			public String toString() {
-				return function().toString()+"("+parameter().toString()+")";
-			}
-		};
-		//} else {
-		//	return Nothing.create("");
-		//}
+		
+		
+		});
 	}
 
 

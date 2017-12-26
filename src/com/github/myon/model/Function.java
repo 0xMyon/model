@@ -13,7 +13,10 @@ public interface Function extends Thing {
 	Thing apply(@NonNull Thing parameter);
 	
 	Type domain();
-	Type codomain();
+	
+	default Type codomain() {
+		return codomain(domain());
+	}
 	
 	Type codomain(@NonNull Type parameter);
 	

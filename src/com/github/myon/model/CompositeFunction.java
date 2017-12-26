@@ -4,6 +4,8 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.github.myon.model.Thing.Visitor;
+
 public interface CompositeFunction extends Function {
 	
 	Function[] elements();
@@ -19,6 +21,10 @@ public interface CompositeFunction extends Function {
 				@Override
 				public Function[] elements() {
 					return elements;
+				}
+				@Override
+				public <T> T accept(Visitor<T> visitor) {
+					return visitor.handle(this);
 				}
 			};
 		}
