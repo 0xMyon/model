@@ -2,6 +2,7 @@ package com.github.myon.model.function;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.github.myon.model.Epsilon;
 import com.github.myon.model.Function;
 import com.github.myon.model.FunctionType;
 import com.github.myon.model.MetaType;
@@ -27,6 +28,12 @@ public interface SystemFunction extends Function {
 		return visitor.handle(this);
 	}
 	
+	@Override
+	public @NonNull
+	default Epsilon isEqual(@NonNull Thing that) {
+		return that == TYPEOF ? Epsilon.INSTANCE : Nothing.of("Not equal");
+	}
+	
 
 	SystemFunction TYPEOF = new SystemFunction() {
 		@Override
@@ -45,6 +52,7 @@ public interface SystemFunction extends Function {
 		public Type domain() {
 			return SystemType.ANYTHING;
 		}
+		
 		
 	};
 
@@ -76,6 +84,7 @@ public interface SystemFunction extends Function {
 			}
 			return Nothing.of("expected Function");
 		}
+
 	};
 
 
@@ -83,15 +92,15 @@ public interface SystemFunction extends Function {
 
 		@Override
 		public Type domain() {
-			return ProductType.create(SystemType.TYPE, SystemType.ANYTHING);
+			return ProductType.of(SystemType.TYPE, SystemType.ANYTHING);
 		}
 
 		@Override
 		public Type codomain(@NonNull final Type parameter) {
 			if (parameter instanceof ProductType) {
 				final ProductType p = (ProductType) parameter;
-				if (p.factors().length == 2) {
-					return ProductType.create();
+				if (p.factors().count() == 2) {
+					return ProductType.of();
 				}
 			}
 			return Void.INSTANCE;
@@ -102,8 +111,8 @@ public interface SystemFunction extends Function {
 		public Thing apply(@NonNull final Thing parameter) {
 			if (parameter instanceof Product) {
 				final Product p = (Product) parameter;
-				if (p.factors().length == 2) {
-					return Product.create();
+				if (p.factors().count() == 2) {
+					return Product.of();
 				}
 			}
 			return Nothing.of("invalid argument");

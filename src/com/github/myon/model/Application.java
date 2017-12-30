@@ -48,6 +48,24 @@ public interface Application extends Thing {
 		
 		});
 	}
+	
+	
+	@NonNull
+	default Epsilon isEqual(@NonNull Thing that) {
+		return that.accept(new Thing.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Thing that) {
+				return Nothing.of("unequal");
+			}
+			@Override
+			public Epsilon handle(Application that) {
+				return Epsilon.Conjunction(
+						function().isEqual(that.function()), 
+						parameter().isEqual(that.parameter())
+						);
+			}
+		});
+	}
 
 
 	@Override

@@ -7,18 +7,23 @@ import org.eclipse.jdt.annotation.NonNull;
 public interface Product extends Thing {
 
 
-	public static Thing create(final Thing... factors) {
+	static Thing of(final Stream<Thing> factors) {
+		return of(factors.toArray(Thing[]::new));
+	}
+		
+	
+	static Thing of(final Thing... factors) {
 		switch(factors.length) {
 
 		case 1: return factors[0];
 		default: return new Product() {
 			@Override
-			public @NonNull Thing[] factors() {
-				return factors;
+			public @NonNull Stream<Thing> factors() {
+				return Stream.of(factors);
 			}
 			@Override
 			public String toString() {
-				return "("+Stream.of(factors).map(Object::toString).reduce((a,b)->a+","+b).orElse("")+")";
+				return "("+Stream.of(factors).map(Object::toString).reduce("", (a,b)->a+","+b)+")";
 			}
 			@Override
 			public <T> T accept(Visitor<T> visitor) {
@@ -28,22 +33,36 @@ public interface Product extends Thing {
 		};
 		}
 	}
+	
+	@NonNull
+	default Epsilon isEqual(@NonNull Thing that) {
+		return that.accept(new Thing.Visitor<Epsilon>() {
+			@Override
+			public Epsilon handle(Thing that) {
+				return Nothing.of("unequal");
+			}
+			@Override
+			public Epsilon handle(Product that) {
+				return Epsilon.Conjunction();
+			}
+		});
+	}
 
-	@NonNull Thing[] factors();
+	@NonNull Stream<? extends Thing> factors();
 
 	@Override
 	public default @NonNull Type typeof() {
-		return ProductType.create(Stream.of(factors()).map(Thing::typeof).toArray(Type[]::new));
+		return ProductType.of(factors().map(Thing::typeof));
 	}
 
 	@Override
 	public default Thing evaluate() {
-		return create(Stream.of(factors()).map(Thing::evaluate).toArray(Thing[]::new));
+		return of(factors().map(Thing::evaluate));
 	}
 
 	@Override
 	public default boolean isEvaluable() {
-		return Stream.of(factors()).anyMatch(Thing::isEvaluable);
+		return factors().anyMatch(Thing::isEvaluable);
 	}
 
 

@@ -2,7 +2,6 @@ package com.github.myon.model;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.sun.prism.es2.ES2Pipeline;
 
 public interface MetaType extends Type {
 

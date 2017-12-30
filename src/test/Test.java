@@ -18,7 +18,7 @@ public class Test {
 
 		Application.create(SystemFunction.TYPEOF, SystemFunction.DOMAIN).printEval();
 
-		Application.create(SystemFunction.CONTAINS, Product.create(SystemType.ANYTHING, Application.create(SystemFunction.ID, SystemFunction.DOMAIN))).printEval();
+		Application.create(SystemFunction.CONTAINS, Product.of(SystemType.ANYTHING, Application.create(SystemFunction.ID, SystemFunction.DOMAIN))).printEval();
 
 
 

@@ -2,13 +2,11 @@ package com.github.myon.model;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.github.myon.model.Thing.Visitor;
-
 public interface ComplementType extends Type {
 
 	Type complement();
 	
-	static Type create(Type complement) {
+	static Type of(Type complement) {
 		if (complement instanceof ComplementType) {
 			return ((ComplementType) complement).complement();
 		} else {
@@ -38,7 +36,7 @@ public interface ComplementType extends Type {
 	
 	@Override
 	public default Type evaluate() {
-		return create(complement().evaluate());
+		return of(complement().evaluate());
 	}
 	
 	@Override

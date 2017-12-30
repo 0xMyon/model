@@ -2,8 +2,6 @@ package com.github.myon.model;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.github.myon.model.Thing.Visitor;
-
 public interface FunctionType extends Type {
 
 	Type domain();
@@ -55,7 +53,7 @@ public interface FunctionType extends Type {
 			}
 			@Override
 			public Epsilon handle(Function that) {
-				return Epsilon.conjunction(
+				return Epsilon.Conjunction(
 						domain().containsAll(that.domain()),
 						codomain().containsAll(that.codomain())
 						);
@@ -76,7 +74,7 @@ public interface FunctionType extends Type {
 			}
 			@Override
 			public Epsilon handle(FunctionType that) {
-				return Epsilon.conjunction(
+				return Epsilon.Conjunction(
 						domain().containsAll(that.domain()),
 						codomain().containsAll(that.codomain())
 						);
@@ -97,7 +95,7 @@ public interface FunctionType extends Type {
 			}
 			@Override
 			public Epsilon handle(FunctionType that) {
-				return Epsilon.conjunction(
+				return Epsilon.Conjunction(
 						domain().intersetcs(that.domain()),
 						codomain().intersetcs(that.codomain())
 						);

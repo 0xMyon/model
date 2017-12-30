@@ -1,10 +1,10 @@
 package com.github.myon.model;
 
+import java.util.stream.Stream;
+
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.github.myon.model.Thing.Visitor;
-
-public interface Void extends FunctionType, MetaType, ProductType {
+public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 
 	Void INSTANCE = new Void() {
 		@Override
@@ -18,8 +18,8 @@ public interface Void extends FunctionType, MetaType, ProductType {
 	};
 	
 	@Override
-	public default Type[] factors() {
-		return new Type[0];
+	public default Stream<? extends Type> factors() {
+		return Stream.of();
 	}
 	
 	@Override
@@ -82,6 +82,11 @@ public interface Void extends FunctionType, MetaType, ProductType {
 	@Override
 	public default Epsilon intersetcs(Type type) {
 		return Nothing.of("no intersection");
+	}
+	
+	@Override 
+	default @NonNull Stream<? extends Type> summants() {
+		return Stream.of();
 	}
 
 }
