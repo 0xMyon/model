@@ -1,9 +1,6 @@
 package com.github.myon.model;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import com.github.myon.model.function.SystemFunction;
-
 
 public interface Function extends Thing {
 
@@ -12,51 +9,53 @@ public interface Function extends Thing {
 	 * @param parameter
 	 * @return
 	 */
-	@NonNull Thing apply(@NonNull Thing parameter);
-	
-	@NonNull Type domain();
-	
-	default @NonNull Type codomain() {
+	Thing apply(Thing parameter);
+
+	Type domain();
+
+	default Type codomain() {
 		return codomain(domain());
 	}
-	
-	@NonNull Type codomain(@NonNull Type parameter);
-	
+
+	Type codomain(Type parameter);
+
 	@Override
-	public default @NonNull FunctionType typeof() {
+	public default  FunctionType typeof() {
 		return FunctionType.create(domain(), codomain());
 	}
-	
+
 	@Override
-	@NonNull Function evaluate();
-	
+	Function evaluate();
+
 	interface Visitor<T> extends Nothing.Visitor<T> {
 		T handle(Function that);
-		
-		default T handle(Abstraction that) {
+
+		default  T handle(final Abstraction that) {
 			return handle((Function)that);
 		}
-		default T handle(CompositeFunction that) {
+		default  T handle(final CompositeFunction that) {
 			return handle((Function)that);
 		}
-		default T handle(SystemFunction that)  {
+		default  T handle(final SystemFunction that)  {
 			return handle((Function)that);
 		}
-		default T handle(UnionFunction that)  {
+		default  T handle(final UnionFunction that)  {
 			return handle((Function)that);
 		}
-		
+
+		@Override
 		@SuppressWarnings("unchecked")
-		default T handle(Nothing that) {
+		default  T handle( final Nothing that) {
 			return (T)that;
 		}
-		
+
 	}
-	
-	default <T> T accept(Thing.Visitor<T> visitor) {
+
+	@Override
+	default  <T> T accept( final Thing. Visitor<T> visitor) {
 		return accept((Visitor<T>)visitor);
 	}
-	
-	<T> T accept(Visitor<T> visitor); 
-	
+
+	<T> T accept(Visitor<T> visitor);
+
 }

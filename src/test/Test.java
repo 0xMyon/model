@@ -10,15 +10,15 @@ public class Test {
 	@org.junit.Test
 	public void test() {
 
-		Application.create(SystemFunction.TYPEOF, SystemFunction.TYPEOF).printEval();
+		Application.of(SystemFunction.TYPEOF, SystemFunction.TYPEOF).printEval();
 
-		Application.create(SystemFunction.DOMAIN, SystemFunction.TYPEOF).printEval();
+		Application.of(SystemFunction.DOMAIN, SystemFunction.TYPEOF).printEval();
 
-		Application.create(SystemFunction.DOMAIN, SystemFunction.DOMAIN).printEval();
+		Application.of(SystemFunction.DOMAIN, SystemFunction.DOMAIN).printEval();
 
-		Application.create(SystemFunction.TYPEOF, SystemFunction.DOMAIN).printEval();
+		Application.of(SystemFunction.TYPEOF, SystemFunction.DOMAIN).printEval();
 
-		Application.create(SystemFunction.CONTAINS, Product.of(SystemType.ANYTHING, Application.create(SystemFunction.ID, SystemFunction.DOMAIN))).printEval();
+		Application.of(SystemFunction.CONTAINS, Product.of(SystemType.ANYTHING, Application.of(SystemFunction.ID, SystemFunction.DOMAIN))).printEval();
 
 
 

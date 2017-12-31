@@ -1,21 +1,22 @@
 package com.github.myon.model;
 
-import org.eclipse.jdt.annotation.NonNull;
 
 public interface Abstraction extends Function {
 
+	@Override
 	Type domain();
+
 	Function implementation();
-	
-	static Abstraction of(Type domain, Function implementation) {
+
+	static Abstraction of(final Type domain, final Function implementation) {
 		// TODO maybe evaluate types a compile time
 		return implementation.typeof().domain().containsAll(domain).accept(new Epsilon.Visitor<Abstraction>() {
 			@Override
-			public Abstraction handle(Nothing that) {
+			public Abstraction handle(final Nothing that) {
 				return that;
 			}
 			@Override
-			public Abstraction handle(Epsilon that) {
+			public Abstraction handle(final Epsilon that) {
 				return new Abstraction() {
 					@Override
 					public Function implementation() {
@@ -26,52 +27,52 @@ public interface Abstraction extends Function {
 						return domain;
 					}
 					@Override
-					public <T> T accept(Function.Visitor<T> visitor) {
+					public <T> T accept(final Function.Visitor<T> visitor) {
 						return visitor.handle(this);
 					}
 				};
 			}
-		
+
 		});
 	}
-	
-	@NonNull
-	default Epsilon isEqual(@NonNull Thing that) {
+
+	@Override
+	default Epsilon isEqual(final Thing that) {
 		return that.accept(new Thing.Visitor<Epsilon>() {
 			@Override
-			public Epsilon handle(Thing that) {
+			public Epsilon handle(final Thing that) {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(Abstraction that) {
+			public Epsilon handle(final Abstraction that) {
 				return Epsilon.Conjunction(
-						domain().isEqual(that.domain()), 
+						domain().isEqual(that.domain()),
 						implementation().isEqual(that.implementation())
 						);
 			}
 		});
 	}
-	
+
 	@Override
 	default boolean isEvaluable() {
 		return domain().isEvaluable() || implementation().isEvaluable();
 	}
-	
-	
-	
+
+
+
 	@Override
-	default @NonNull Function evaluate() {
+	default Function evaluate() {
 		return of(domain().evaluate(), implementation().evaluate());
 	}
-	
+
 	@Override
-	default @NonNull Type codomain(@NonNull Type parameter) {
+	default Type codomain(final Type parameter) {
 		return implementation().codomain(parameter);
 	}
-	
+
 	@Override
-	default @NonNull Thing apply(@NonNull Thing parameter) {
+	default Thing apply(final Thing parameter) {
 		return implementation().apply(parameter);
 	}
-	
+
 }

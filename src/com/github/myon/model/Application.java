@@ -1,7 +1,5 @@
 package com.github.myon.model;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 /**
  * Application of a {@link Function} to a {@link Thing} parameter
  * @author 0xMyon
@@ -9,28 +7,28 @@ import org.eclipse.jdt.annotation.NonNull;
  */
 public interface Application extends Thing {
 
-	@NonNull Function function();
-	@NonNull Thing parameter();
+	Function function();
+	Thing parameter();
 
 
-	static Application create(final Function function, final Thing parameter) {
+	static Application of(final Function function, final Thing parameter) {
 		return function.typeof().domain().containsAll(parameter.typeof()).accept(new Epsilon.Visitor<Application>() {
 
 			@Override
-			public Application handle(Nothing cause) {
+			public Application handle(final Nothing cause) {
 				return Nothing.of("Type missmatch "+function.typeof().domain().toString()+" !>>> "+parameter.typeof().toString(), cause);
 			}
 
 			@Override
-			public Application handle(Epsilon that) {
+			public Application handle(final Epsilon that) {
 				return new Application() {
 					@Override
-					public @NonNull Thing parameter() {
+					public  Thing parameter() {
 						return parameter;
 					}
-		
+
 					@Override
-					public @NonNull Function function() {
+					public Function function() {
 						return function;
 					}
 					@Override
@@ -39,28 +37,28 @@ public interface Application extends Thing {
 					}
 
 					@Override
-					public <T> T accept(Visitor<T> visitor) {
+					public <T>  T accept(final Visitor<T> visitor) {
 						return visitor.handle(this);
 					}
 				};
 			}
-		
-		
+
+
 		});
 	}
-	
-	
-	@NonNull
-	default Epsilon isEqual(@NonNull Thing that) {
+
+
+	@Override
+	default Epsilon isEqual(final Thing that) {
 		return that.accept(new Thing.Visitor<Epsilon>() {
 			@Override
-			public Epsilon handle(Thing that) {
+			public Epsilon handle(final Thing that) {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(Application that) {
+			public Epsilon handle(final Application that) {
 				return Epsilon.Conjunction(
-						function().isEqual(that.function()), 
+						function().isEqual(that.function()),
 						parameter().isEqual(that.parameter())
 						);
 			}
@@ -69,22 +67,21 @@ public interface Application extends Thing {
 
 
 	@Override
-	public @NonNull
 	default Type typeof() {
 		return function().codomain(parameter().typeof());
 	}
 
 	@Override
-	public default boolean isEvaluable() {
+	default boolean isEvaluable() {
 		return true;
 	}
 
 	@Override
 	public default Thing evaluate() {
 		if (function().isEvaluable()) {
-			return create(function().evaluate(), parameter());
+			return of(function().evaluate(), parameter());
 		} else if (parameter().isEvaluable()) {
-			return create(function(), parameter().evaluate());
+			return of(function(), parameter().evaluate());
 		} else {
 			return function().apply(parameter());
 		}

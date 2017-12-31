@@ -1,7 +1,5 @@
 package com.github.myon.model.function;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import com.github.myon.model.Epsilon;
 import com.github.myon.model.Function;
 import com.github.myon.model.FunctionType;
@@ -22,22 +20,22 @@ public interface SystemFunction extends Function {
 	public default SystemFunction evaluate() {
 		return this;
 	}
-	
+
 	@Override
-	public default <T> T accept(Visitor<T> visitor) {
+	public default <T> T accept(final Visitor<T> visitor) {
 		return visitor.handle(this);
 	}
-	
+
 	@Override
-	public @NonNull
-	default Epsilon isEqual(@NonNull Thing that) {
+	public
+	default Epsilon isEqual( final Thing that) {
 		return that == TYPEOF ? Epsilon.INSTANCE : Nothing.of("Not equal");
 	}
-	
+
 
 	SystemFunction TYPEOF = new SystemFunction() {
 		@Override
-		public Type apply(@NonNull final Thing parameter) {
+		public Type apply( final Thing parameter) {
 			return parameter.typeof();
 		}
 		@Override
@@ -45,15 +43,15 @@ public interface SystemFunction extends Function {
 			return "typeof";
 		}
 		@Override
-		public Type codomain(@NonNull final Type parameter) {
+		public Type codomain( final Type parameter) {
 			return MetaType.create(parameter);
 		}
 		@Override
 		public Type domain() {
 			return SystemType.ANYTHING;
 		}
-		
-		
+
+
 	};
 
 	SystemFunction DOMAIN = new SystemFunction() {
@@ -69,7 +67,7 @@ public interface SystemFunction extends Function {
 		}
 
 		@Override
-		public Type codomain(@NonNull final Type parameter) {
+		public Type codomain( final Type parameter) {
 			if (parameter instanceof FunctionType) {
 				return ((FunctionType)parameter).domain();
 			}
@@ -78,7 +76,7 @@ public interface SystemFunction extends Function {
 
 
 		@Override
-		public Thing apply(@NonNull final Thing parameter) {
+		public Thing apply( final Thing parameter) {
 			if (parameter instanceof Function) {
 				return ((Function)parameter).domain();
 			}
@@ -96,7 +94,7 @@ public interface SystemFunction extends Function {
 		}
 
 		@Override
-		public Type codomain(@NonNull final Type parameter) {
+		public Type codomain( final Type parameter) {
 			if (parameter instanceof ProductType) {
 				final ProductType p = (ProductType) parameter;
 				if (p.factors().count() == 2) {
@@ -108,7 +106,7 @@ public interface SystemFunction extends Function {
 
 
 		@Override
-		public Thing apply(@NonNull final Thing parameter) {
+		public Thing apply( final Thing parameter) {
 			if (parameter instanceof Product) {
 				final Product p = (Product) parameter;
 				if (p.factors().count() == 2) {
@@ -134,13 +132,13 @@ public interface SystemFunction extends Function {
 		}
 
 		@Override
-		public Type codomain(@NonNull final Type parameter) {
+		public Type codomain( final Type parameter) {
 			return parameter;
 		}
 
 
 		@Override
-		public Thing apply(@NonNull final Thing parameter) {
+		public Thing apply( final Thing parameter) {
 			return parameter;
 		}
 

@@ -2,20 +2,18 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import com.github.myon.model.function.SystemType;
 
 public interface Union extends Thing {
 
-	@NonNull Stream<? extends Thing> summants();
-	
-	static @NonNull Thing of(final @NonNull Stream<Thing> summants) {
+	Stream<? extends Thing> summants();
+
+	static Thing of(final Stream<Thing> summants) {
 		return of(summants.toArray(Thing[]::new));
 	}
-		
-	
-	static @NonNull Thing of(final @NonNull Thing... summants) {
+
+
+	static Thing of(final  Thing... summants) {
 		switch (summants.length) {
 		case 0:
 			return Nothing.of("empty union");
@@ -24,40 +22,40 @@ public interface Union extends Thing {
 		default:
 			return new Union() {
 				@Override
-				public <T> @NonNull T accept(@NonNull Visitor<T> visitor) {
+				public <T>  T accept( final Visitor<T> visitor) {
 					return visitor.handle(this);
 				}
 				@Override
-				public @NonNull Stream<Thing> summants() {
+				public  Stream<Thing> summants() {
 					return Stream.of(summants);
 				}
 			};
 		}
 	}
-	
+
 	@Override
-	default @NonNull Type typeof() {
+	default  Type typeof() {
 		return summants().map(Thing::typeof).reduce(SystemType.VOID, Type::unite);
 	}
-	
+
 	@Override
 	default boolean isEvaluable() {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	@Override
-	default @NonNull Thing evaluate() {
+	default  Thing evaluate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
-	default @NonNull Epsilon isEqual(@NonNull Thing that) {
+	default  Epsilon isEqual( final Thing that) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-	
+
+
+
 }

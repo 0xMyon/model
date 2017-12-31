@@ -2,36 +2,34 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 
-	Void INSTANCE = new Void() {
+	static Void INSTANCE = new Void() {
 		@Override
 		public String toString() {
 			return "{}";
 		}
 		@Override
-		public <T> T accept(Visitor<T> visitor) {
+		public <T> T accept(final  Visitor<T> visitor) {
 			return visitor.handle(this);
 		}
 	};
-	
+
 	@Override
 	public default Stream<? extends Type> factors() {
 		return Stream.of();
 	}
-	
+
 	@Override
 	public default Nothing base() {
 		return Nothing.of("undefined");
 	}
-	
+
 	@Override
 	public default Type domain() {
 		return Nothing.of("undefined");
 	}
-	
+
 	@Override
 	public default Type codomain() {
 		return Nothing.of("undefined");
@@ -43,49 +41,49 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 	}
 
 	@Override
-	default FunctionType evaluate() {
+	default  FunctionType evaluate() {
 		return this;
 	}
 
 	@Override
-	default Epsilon contains(@NonNull Thing thing) {
+	default  Epsilon contains( final Thing thing) {
 		return thing.accept(new Thing.Visitor<Epsilon>() {
 			@Override
-			public Epsilon handle(Thing that) {
+			public  Epsilon handle(final  Thing that) {
 				return Nothing.TypeMiss(Void.this, that);
 			}
 			@Override
-			public Epsilon handle(Nothing that) {
+			public  Epsilon handle(final  Nothing that) {
 				return Epsilon.INSTANCE;
 			}
-		});
-	}
-	
-	@Override
-	public default Epsilon containsAll(Type type) {
-		return type.accept(new Type.Visitor<Epsilon>(){
-			@Override
-			public Epsilon handle(Type that) {
-				return Nothing.of(that.toString()+" is not empty");
-			}
-			@Override
-			public Epsilon handle(Void that) {
-				return Epsilon.INSTANCE;
-			}
-			@Override
-			public Epsilon handle(Nothing that) {
-				return Nothing.of(that.toString()+" is not a type");
-			}			
 		});
 	}
 
 	@Override
-	public default Epsilon intersetcs(Type type) {
+	public default  Epsilon containsAll(final  Type type) {
+		return type.accept(new Type.Visitor<Epsilon>(){
+			@Override
+			public  Epsilon handle(final  Type that) {
+				return Nothing.of(that.toString()+" is not empty");
+			}
+			@Override
+			public  Epsilon handle(final  Void that) {
+				return Epsilon.INSTANCE;
+			}
+			@Override
+			public  Epsilon handle(final  Nothing that) {
+				return Nothing.of(that.toString()+" is not a type");
+			}
+		});
+	}
+
+	@Override
+	public default Epsilon intersetcs(final  Type type) {
 		return Nothing.of("no intersection");
 	}
-	
-	@Override 
-	default @NonNull Stream<? extends Type> summants() {
+
+	@Override
+	default Stream<? extends Type> summants() {
 		return Stream.of();
 	}
 

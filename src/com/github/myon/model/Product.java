@@ -2,23 +2,21 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 public interface Product extends Thing {
 
 
 	static Thing of(final Stream<Thing> factors) {
 		return of(factors.toArray(Thing[]::new));
 	}
-		
-	
+
+
 	static Thing of(final Thing... factors) {
 		switch(factors.length) {
 
 		case 1: return factors[0];
 		default: return new Product() {
 			@Override
-			public @NonNull Stream<Thing> factors() {
+			public  Stream<Thing> factors() {
 				return Stream.of(factors);
 			}
 			@Override
@@ -26,32 +24,33 @@ public interface Product extends Thing {
 				return "("+Stream.of(factors).map(Object::toString).reduce("", (a,b)->a+","+b)+")";
 			}
 			@Override
-			public <T> T accept(Visitor<T> visitor) {
+			public <T> T accept(final Visitor<T> visitor) {
 				return visitor.handle(this);
 			}
-			
+
 		};
 		}
 	}
-	
-	@NonNull
-	default Epsilon isEqual(@NonNull Thing that) {
+
+	@Override
+
+	default Epsilon isEqual( final Thing that) {
 		return that.accept(new Thing.Visitor<Epsilon>() {
 			@Override
-			public Epsilon handle(Thing that) {
+			public Epsilon handle(final Thing that) {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(Product that) {
+			public Epsilon handle(final Product that) {
 				return Epsilon.Conjunction();
 			}
 		});
 	}
 
-	@NonNull Stream<? extends Thing> factors();
+	Stream<? extends Thing> factors();
 
 	@Override
-	public default @NonNull Type typeof() {
+	public default  Type typeof() {
 		return ProductType.of(factors().map(Thing::typeof));
 	}
 
