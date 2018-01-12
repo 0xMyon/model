@@ -21,7 +21,7 @@ public interface SystemType extends Type {
 	
 	static final Type ANYTHING = ComplementType.of(VOID);
 	
-	static final Type TYPE = MetaType.create(ANYTHING);
+	static final Type TYPE = MetaType.of(ANYTHING);
 	
 	
 }

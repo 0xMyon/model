@@ -1,12 +1,24 @@
 package com.github.myon.model;
 
+import java.util.stream.Stream;
 
 /**
  * Most abstract type
  * @author 0xMyon
  */
-public interface Thing {
+public interface Thing extends Comparable<Thing> {
 
+	@Override
+	default int compareTo(Thing that) {
+		int v = this.getClass().getName().compareTo(that.getClass().getName());
+		if (0 == v) {
+			throw new Error("has to be implemented in child");
+		} else {
+			return v;
+		}
+	}
+	
+	
 	/**
 	 * @return most fitting {@link Type}
 	 */
@@ -21,6 +33,10 @@ public interface Thing {
 
 
 	Thing evaluate();
+	
+	default Thing apply(Function function) {
+		return Application.of(function, this);
+	}
 
 	boolean isEvaluable();
 
@@ -35,38 +51,80 @@ public interface Thing {
 	}
 
 
-	<T>  T accept(final Visitor<T> visitor);
+	/**
+	 * Superposes two {@link Thing}s
+	 * @param that left hand operand
+	 * @return Superposed {@link Thing}
+	 */
+	default Thing superpose(final Thing that) {
+		return Superposition.of(this, that);
+	}
+
+	/**
+	 * Superposes multiple {@link Thing}s
+	 * @param supoersosed
+	 * @return 
+	 * @see #superpose(Thing)
+	 */
+	static Thing Superposition(final Stream<Thing> supoersosed) {
+		return supoersosed.reduce(Thing::superpose).orElse(Nothing.of("empty superposition"));
+	}
+	
+	static Thing Superposition(Thing... superposed) {
+		return Superposition(Stream.of(superposed));
+	}
+	
+	
+	default Thing concat(final Thing that) {
+		return Product.of(this, that);
+	}
+	
+	static Thing Sequence(final Stream<Thing> sequenced) {
+		return sequenced.reduce(Epsilon.INSTANCE, Thing::concat);
+	}
+	
+	
+
+	<T> T accept(final Visitor<T> visitor);
 
 	static interface Visitor<T> extends Type.Visitor<T>, Epsilon.Visitor<T>, Function.Visitor<T> {
 
 		T handle(final Thing that);
 
 		@Override
-		default  T handle(final  Type that) {
+		default T handle(final Type that) {
 			return handle((Thing)that);
 		}
 
 		@Override
-		default  T handle(final  Function that)  {
+		default T handle(final Function that)  {
 			return handle((Thing)that);
 		}
 
 		@Override
-		default  T handle(final  Epsilon that) {
+		default T handle(final Epsilon that) {
 			return handle((Product)that);
 		}
 
-		default  T handle(final Product that) {
+		default T handle(final Product that) {
 			return handle((Thing)that);
 		}
 
-		default  T handle(final Application that)  {
+		default T handle(final Superposition that) {
+			return handle((Thing)that);
+		}
+
+		default T handle(final Concurrency that) {
+			return handle((Thing)that);
+		}
+
+		default T handle(final Application that)  {
 			return handle((Thing)that);
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		default  T handle(final  Nothing that) {
+		default T handle(final Nothing that) {
 			return (T)that;
 		}
 

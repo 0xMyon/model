@@ -23,6 +23,19 @@ public interface FunctionType extends Type {
 			public <T> T accept(final Visitor<T> visitor) {
 				return visitor.handle(this);
 			}
+			@Override
+			public int compareTo(final Thing that) {
+				return that.accept(new Thing.Visitor<Integer>() {
+					@Override
+					public Integer handle(final Thing that) {
+						return getClass().getName().compareTo(that.getClass().getName());
+					}
+					@Override
+					public Integer handle(final FunctionType that) {
+						return domain().compareTo(that.domain()) + codomain().compareTo(that.codomain());
+					}
+				});
+			}
 		};
 	}
 

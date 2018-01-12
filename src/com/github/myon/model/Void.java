@@ -10,8 +10,21 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 			return "{}";
 		}
 		@Override
-		public <T> T accept(final  Visitor<T> visitor) {
+		public <T> T accept(final Visitor<T> visitor) {
 			return visitor.handle(this);
+		}
+		@Override
+		public int compareTo(final Thing that) {
+			return that.accept(new Thing.Visitor<Integer>() {
+				@Override
+				public Integer handle(final Thing that) {
+					return getClass().getName().compareTo(that.getClass().getName());
+				}
+				@Override
+				public Integer handle(final Void that) {
+					return 0;
+				}
+			});
 		}
 	};
 
@@ -83,7 +96,7 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 	}
 
 	@Override
-	default Stream<? extends Type> summants() {
+	default Stream<? extends Type> superposed() {
 		return Stream.of();
 	}
 

@@ -2,7 +2,7 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-public abstract class Nothing extends Exception implements Application, Function, Void, Epsilon, Abstraction, Union, UnionFunction {
+public abstract class Nothing extends Exception implements Application, Function, Void, Epsilon, Abstraction, Superposition, UnionFunction {
 
 	private final String what;
 
@@ -30,6 +30,20 @@ public abstract class Nothing extends Exception implements Application, Function
 	@Override
 	public Function implementation() {
 		return this;
+	}
+
+	@Override
+	public int compareTo(final Thing that) {
+		return that.accept(new Thing.Visitor<Integer>() {
+			@Override
+			public Integer handle(final Thing that) {
+				return getClass().getName().compareTo(that.getClass().getName());
+			}
+			@Override
+			public Integer handle(final Nothing that) {
+				return base().compareTo(that.base());
+			}
+		});
 	}
 
 
@@ -158,7 +172,7 @@ public abstract class Nothing extends Exception implements Application, Function
 
 
 	@Override
-	public Thing apply( final Thing parameter) {
+	public Thing evaluate( final Thing parameter) {
 		return of("Function 'apply' is not defined on type 'Nothing'");
 	}
 
@@ -196,7 +210,7 @@ public abstract class Nothing extends Exception implements Application, Function
 	}
 
 	@Override
-	public  Stream<? extends Nothing> summants() {
+	public  Stream<? extends Nothing> superposed() {
 		return Stream.of();
 	}
 

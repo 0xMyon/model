@@ -23,7 +23,7 @@ public interface Application extends Thing {
 			public Application handle(final Epsilon that) {
 				return new Application() {
 					@Override
-					public  Thing parameter() {
+					public Thing parameter() {
 						return parameter;
 					}
 
@@ -37,8 +37,26 @@ public interface Application extends Thing {
 					}
 
 					@Override
-					public <T>  T accept(final Visitor<T> visitor) {
+					public <T> T accept(final Visitor<T> visitor) {
 						return visitor.handle(this);
+					}
+
+					@Override
+					public int compareTo(final Thing that) {
+						return that.accept(new Thing.Visitor<Integer>() {
+							@Override
+							public Integer handle(final Thing that) {
+								return getClass().getName().compareTo(that.getClass().getName());
+							}
+							@Override
+							public Integer handle(final Nothing that) {
+								return getClass().getName().compareTo(that.getClass().getName());
+							}
+							@Override
+							public Integer handle(final Application that) {
+								return function().compareTo(that.function()) + parameter().compareTo(that.parameter());
+							}
+						});
 					}
 				};
 			}
@@ -83,7 +101,20 @@ public interface Application extends Thing {
 		} else if (parameter().isEvaluable()) {
 			return of(function(), parameter().evaluate());
 		} else {
-			return function().apply(parameter());
+			return parameter().accept(new Thing.Visitor<Thing>() {
+				@Override
+				public Thing handle(Thing that) {
+					return function().evaluate(parameter());
+				}
+				@Override
+				public Thing handle(Nothing that) {
+					return function().evaluate(parameter());
+				}
+				@Override
+				public Thing handle(Superposition that) {
+					return Thing.Superposition(that.superposed().map(function()::evaluate));
+				}
+			});
 		}
 	}
 

@@ -3,13 +3,9 @@ package com.github.myon.model;
 
 public interface Abstraction extends Function {
 
-	@Override
-	Type domain();
-
 	Function implementation();
 
 	static Abstraction of(final Type domain, final Function implementation) {
-		// TODO maybe evaluate types a compile time
 		return implementation.typeof().domain().containsAll(domain).accept(new Epsilon.Visitor<Abstraction>() {
 			@Override
 			public Abstraction handle(final Nothing that) {
@@ -30,11 +26,26 @@ public interface Abstraction extends Function {
 					public <T> T accept(final Function.Visitor<T> visitor) {
 						return visitor.handle(this);
 					}
+					@Override
+					public int compareTo(final Thing that) {
+						return that.accept(new Thing.Visitor<Integer>() {
+							@Override
+							public Integer handle(final Thing that) {
+								return getClass().getName().compareTo(that.getClass().getName());
+							}
+							@Override
+							public Integer handle(final Abstraction that) {
+								return domain().compareTo(that.domain()) + implementation().compareTo(that.implementation());
+							}
+						});
+					}
 				};
 			}
 
 		});
 	}
+
+
 
 	@Override
 	default Epsilon isEqual(final Thing that) {
@@ -71,8 +82,8 @@ public interface Abstraction extends Function {
 	}
 
 	@Override
-	default Thing apply(final Thing parameter) {
-		return implementation().apply(parameter);
+	default Thing evaluate(final Thing parameter) {
+		return implementation().evaluate(parameter);
 	}
 
 }

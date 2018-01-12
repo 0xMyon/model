@@ -6,12 +6,11 @@ import com.github.myon.model.function.SystemType;
 
 public interface UnionFunction extends Function {
 
-	Stream<? extends Function> summants();
+	Stream<? extends Function> superposed();
 
 	static Function of(final Stream<Function> summants) {
 		return of(summants.toArray(Function[]::new));
 	}
-
 
 	static Function of(final  Function... summants) {
 		switch (summants.length) {
@@ -22,9 +21,9 @@ public interface UnionFunction extends Function {
 		default:
 			return new UnionFunction() {
 				@Override
-				public  Stream<Function> summants() {
+				public  Stream<Function> superposed() {
 					//TODO sort & eliminate doubles & reduce nested Unions
-					return Stream.of(summants);
+					return Stream.of(summants).distinct();
 				}
 				@Override
 				public <T> T accept(final Visitor<T> visitor) {
@@ -38,51 +37,68 @@ public interface UnionFunction extends Function {
 				public int hashCode() {
 					return Stream.of(summants).mapToInt(Function::hashCode).reduce(Function.class.hashCode(), (a,b) -> a^b);
 				}
+				@Override
+				public int compareTo(final Thing that) {
+					return that.accept(new Thing.Visitor<Integer>() {
+						@Override
+						public Integer handle(final Thing that) {
+							return getClass().getName().compareTo(that.getClass().getName());
+						}
+						@Override
+						public Integer handle(final Superposition that) {
+							try {
+								return Streams.zip(superposed(), that.superposed(), Thing::compareTo).reduce(0, (a,b)->a+b);
+							} catch (final Nothing e) {
+								return (int) (superposed().count() - that.superposed().count());
+							}
+						}
+					});
+				}
 			};
 		}
 	}
 
 	@Override
-	public default boolean isEvaluable() {
-		return summants().anyMatch(Function::isEvaluable);
+	default boolean isEvaluable() {
+		return superposed().anyMatch(Function::isEvaluable);
 	}
 
 	@Override
-	public
 	default Epsilon isEqual( final Thing that) {
 		return that.accept(new Thing.Visitor<Epsilon>(){
 			@Override
-			public  Epsilon handle( final Thing that) {
+			public  Epsilon handle(final Thing that) {
 				return Nothing.of("not equal");
 			}
-
+			@Override
+			public  Epsilon handle(final UnionFunction that) {
+				try {
+					return Epsilon.Conjunction(Streams.zip(superposed(), that.superposed(), Function::isEqual));
+				} catch (final Nothing e) {
+					return e;
+				}
+			}
 		});
 	}
 
 	@Override
-	public
 	default Function evaluate() {
-		return of(summants().map(Function::evaluate));
+		return of(superposed().map(Function::evaluate));
 	}
 
 	@Override
-	public
 	default Type domain() {
-		return summants().map(Function::domain).reduce(SystemType.ANYTHING, Type::intersect);
+		return superposed().map(Function::domain).reduce(SystemType.ANYTHING, Type::intersect);
 	}
 
 	@Override
-	public
 	default Type codomain( final Type parameter) {
-		return summants().map(f -> f.codomain(parameter)).reduce(SystemType.VOID, Type::unite);
+		return superposed().map(f -> f.codomain(parameter)).reduce(SystemType.VOID, Type::unite);
 	}
 
 	@Override
-	public
-	default Thing apply( final Thing parameter) {
-		return Union.of(summants().map(f -> f.apply(parameter)));
+	default Thing evaluate( final Thing parameter) {
+		return Superposition.of(superposed().map(f -> f.evaluate(parameter)));
 	}
-
-
 
 }

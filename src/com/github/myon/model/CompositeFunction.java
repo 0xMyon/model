@@ -22,7 +22,21 @@ public interface CompositeFunction extends Function {
 	}
 
 	static Function of(final Stream<Function> elements) {
-		return of(elements.toArray(Function[]::new));
+		return of(elements.map(t -> t.accept(new Function.Visitor<Stream<? extends Function>>() {
+			@Override
+			public Stream<Function> handle(Function that) {
+				return Stream.of(that);
+			}
+			@Override
+			public Stream<Function> handle(Nothing that) {
+				return Stream.of(that);
+			}
+			@Override
+			public Stream<? extends Function> handle(CompositeFunction that) {
+				return that.elements();
+			}
+		})).reduce(Stream.of(), Stream::concat).toArray(Function[]::new));
+		//return of(elements.toArray(Function[]::new));
 	}
 
 	static Function of(final Function... elements) {
@@ -44,7 +58,24 @@ public interface CompositeFunction extends Function {
 				}
 				@Override
 				public String toString() {
-					return elements().map(Object::toString).reduce("", (a,b)->a+"."+b);
+					return elements().map(Object::toString).reduce((a,b)->a+"."+b).orElse("id");
+				}
+				@Override
+				public int compareTo(final Thing that) {
+					return that.accept(new Thing.Visitor<Integer>() {
+						@Override
+						public Integer handle(final Thing that) {
+							return getClass().getName().compareTo(that.getClass().getName());
+						}
+						@Override
+						public Integer handle(final CompositeFunction that) {
+							try {
+								return Streams.zip(elements(), that.elements(), Thing::compareTo).reduce(0, (a,b)->a+b);
+							} catch (final Nothing e) {
+								return (int) (elements().count() - that.elements().count());
+							}
+						}
+					});
 				}
 			};
 		}
@@ -78,8 +109,8 @@ public interface CompositeFunction extends Function {
 	}
 
 	@Override
-	public default Thing apply(final Thing parameter) {
-		return elements().<java.util.function.Function<Thing,Thing>>map(f -> f::apply )
+	public default Thing evaluate(final Thing parameter) {
+		return elements().<java.util.function.Function<Thing,Thing>>map(f -> f::evaluate )
 				.reduce(java.util.function.Function::andThen).orElse(t -> t).apply(parameter);
 	}
 

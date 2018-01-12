@@ -1,5 +1,7 @@
 package com.github.myon.model;
 
+import java.util.stream.Stream;
+
 /**
  *
  * @author 0xMyon
@@ -15,15 +17,15 @@ public interface Type extends Thing {
 	Epsilon contains(final Thing thing);
 
 	@Override
-	default  MetaType typeof() {
-		return MetaType.create(this);
+	default MetaType typeof() {
+		return MetaType.of(this);
 	}
 
 	@Override
 	Type evaluate();
 
 	@Override
-	default  Epsilon isEqual(final  Thing that) {
+	default Epsilon isEqual(final Thing that) {
 		return that.accept(new Thing.Visitor<Epsilon>() {
 			@Override
 			public  Epsilon handle(final Thing that) {
@@ -53,9 +55,13 @@ public interface Type extends Thing {
 		return UnionType.of(this, that);
 	}
 
+	static Type Union(final Stream<Type> united) {
+		return united.reduce(Void.INSTANCE, Type::unite);
+	}
+
 
 	@Override
-	default <T>  T accept(final Thing. Visitor<T> visitor) {
+	default <T> T accept(final Thing.Visitor<T> visitor) {
 		return accept((Visitor<T>)visitor);
 	}
 
@@ -65,29 +71,37 @@ public interface Type extends Thing {
 
 		T handle(final Type that);
 
-		default  T handle(final MetaType that) {
+		default T handle(final MetaType that) {
 			return handle((Type)that);
 		}
 
-		default  T handle(final ComplementType that) {
+		default T handle(final ComplementType that) {
 			return handle((Type)that);
 		}
 
-		default  T handle(final FunctionType that) {
+		default T handle(final FunctionType that) {
 			return handle((Type)that);
 		}
 
-		default  T handle(final Void that) {
+		default T handle(final Void that) {
 			return handle((Type)that);
 		}
 
-		default  T handle(final ProductType that) {
+		default T handle(final ProductType that) {
+			return handle((Type)that);
+		}
+		
+		default T handle(final UnionType that) {
+			return handle((Type)that);
+		}
+
+		default T handle(final ConcurrencyType that) {
 			return handle((Type)that);
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		default  T handle(final  Nothing that) {
+		default T handle(final Nothing that) {
 			return (T)that;
 		}
 

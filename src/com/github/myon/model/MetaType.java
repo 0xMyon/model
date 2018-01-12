@@ -4,7 +4,7 @@ public interface MetaType extends Type {
 
 	Type base();
 
-	static MetaType create(final Type base) {
+	static MetaType of(final Type base) {
 		return new MetaType() {
 			@Override
 			public Type base() {
@@ -18,6 +18,19 @@ public interface MetaType extends Type {
 			public <T> T accept(final Visitor<T> visitor) {
 				return visitor.handle(this);
 			}
+			@Override
+			public int compareTo(final Thing that) {
+				return that.accept(new Thing.Visitor<Integer>() {
+					@Override
+					public Integer handle(final Thing that) {
+						return getClass().getName().compareTo(that.getClass().getName());
+					}
+					@Override
+					public Integer handle(final MetaType that) {
+						return base().compareTo(that.base());
+					}
+				});
+			}
 		};
 	}
 
@@ -29,7 +42,7 @@ public interface MetaType extends Type {
 
 	@Override
 	public default Type evaluate() {
-		return create(base().evaluate());
+		return of(base().evaluate());
 	}
 
 	@Override
@@ -54,10 +67,6 @@ public interface MetaType extends Type {
 	public default Epsilon containsAll(final Type type) {
 		return type.accept(new Type.Visitor<Epsilon>() {
 			@Override
-			public Epsilon handle(final Nothing that) {
-				return Nothing.of("Not a Type");
-			}
-			@Override
 			public Epsilon handle(final Type that) {
 				return Nothing.of("undefined");
 			}
@@ -71,17 +80,10 @@ public interface MetaType extends Type {
 	@Override
 	public default Epsilon intersetcs(final Type type) {
 		return type.accept(new Type.Visitor<Epsilon>() {
-
-			@Override
-			public Epsilon handle(final Nothing that) {
-				return Nothing.of("no type");
-			}
-
 			@Override
 			public Epsilon handle(final Type that) {
 				return Nothing.of(MetaType.this.toString()+" does not intersetcs "+that.toString());
 			}
-
 			@Override
 			public Epsilon handle(final MetaType that) {
 				return base().intersetcs(that.base());

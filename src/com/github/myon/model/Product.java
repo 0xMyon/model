@@ -12,23 +12,43 @@ public interface Product extends Thing {
 
 	static Thing of(final Thing... factors) {
 		switch(factors.length) {
+		case 0:
+			return Epsilon.INSTANCE;
+		case 1:
+			return factors[0];
+		default:
+			return new Product() {
+				@Override
+				public  Stream<Thing> factors() {
+					return Stream.of(factors);
+				}
+				@Override
+				public String toString() {
+					return "("+Stream.of(factors).map(Object::toString).reduce((a,b)->a+","+b).orElse("")+")";
+				}
+				@Override
+				public <T> T accept(final Visitor<T> visitor) {
+					return visitor.handle(this);
+				}
+				@Override
+				public int compareTo(final Thing that) {
+					return that.accept(new Thing.Visitor<Integer>() {
+						@Override
+						public Integer handle(final Thing that) {
+							return getClass().getName().compareTo(that.getClass().getName());
+						}
+						@Override
+						public Integer handle(final Product that) {
+							try {
+								return Streams.zip(factors(), that.factors(), Thing::compareTo).reduce(0, (a,b)->a+b);
+							} catch (final Nothing e) {
+								return (int) (factors().count() - that.factors().count());
+							}
+						}
+					});
+				}
 
-		case 1: return factors[0];
-		default: return new Product() {
-			@Override
-			public  Stream<Thing> factors() {
-				return Stream.of(factors);
-			}
-			@Override
-			public String toString() {
-				return "("+Stream.of(factors).map(Object::toString).reduce("", (a,b)->a+","+b)+")";
-			}
-			@Override
-			public <T> T accept(final Visitor<T> visitor) {
-				return visitor.handle(this);
-			}
-
-		};
+			};
 		}
 	}
 
