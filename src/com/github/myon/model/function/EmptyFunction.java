@@ -1,6 +1,13 @@
-package com.github.myon.model;
+package com.github.myon.model.function;
 
-public interface EmptyFunction extends CompositeFunction, UnionFunction, Abstraction {
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Function;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
+import com.github.myon.model.Void;
+
+public interface EmptyFunction extends Composition, UnionFunction, Abstraction {
 
 
 
@@ -9,7 +16,7 @@ public interface EmptyFunction extends CompositeFunction, UnionFunction, Abstrac
 	@Override
 	default Type codomain(final Type parameter) {
 		// TODO Auto-generated method stub
-		return CompositeFunction.super.codomain(parameter);
+		return Composition.super.codomain(parameter);
 	}
 
 	@Override
@@ -25,7 +32,7 @@ public interface EmptyFunction extends CompositeFunction, UnionFunction, Abstrac
 	@Override
 	default Epsilon isEqual(final Thing that) {
 		// TODO Auto-generated method stub
-		return CompositeFunction.super.isEqual(that);
+		return Composition.super.isEqual(that);
 	}
 
 	@Override

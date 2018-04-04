@@ -10,7 +10,6 @@ public interface Application extends Thing {
 	Function function();
 	Thing parameter();
 
-
 	static Application of(final Function function, final Thing parameter) {
 		return function.typeof().domain().containsAll(parameter.typeof()).accept(new Epsilon.Visitor<Application>() {
 
@@ -103,15 +102,15 @@ public interface Application extends Thing {
 		} else {
 			return parameter().accept(new Thing.Visitor<Thing>() {
 				@Override
-				public Thing handle(Thing that) {
+				public Thing handle(final Thing that) {
 					return function().evaluate(parameter());
 				}
 				@Override
-				public Thing handle(Nothing that) {
+				public Thing handle(final Nothing that) {
 					return function().evaluate(parameter());
 				}
 				@Override
-				public Thing handle(Superposition that) {
+				public Thing handle(final Superposition that) {
 					return Thing.Superposition(that.superposed().map(function()::evaluate));
 				}
 			});

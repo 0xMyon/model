@@ -2,6 +2,11 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
+import com.github.myon.model.type.FunctionType;
+import com.github.myon.model.type.MetaType;
+import com.github.myon.model.type.ProductType;
+import com.github.myon.model.type.UnionType;
+
 public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 
 	static Void INSTANCE = new Void() {
@@ -27,6 +32,20 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 			});
 		}
 	};
+
+	@Override
+	default Nothing cast(final Thing thing) {
+		return thing.accept(new Thing.Visitor<Nothing>() {
+			@Override
+			public Nothing handle(final Thing that) {
+				return Nothing.of("Cast exception");
+			}
+			@Override
+			public Nothing handle(final Nothing that) {
+				return that;
+			}
+		});
+	}
 
 	@Override
 	public default Stream<? extends Type> factors() {

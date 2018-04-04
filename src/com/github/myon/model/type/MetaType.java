@@ -1,4 +1,9 @@
-package com.github.myon.model;
+package com.github.myon.model.type;
+
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
 
 public interface MetaType extends Type {
 
@@ -34,6 +39,20 @@ public interface MetaType extends Type {
 		};
 	}
 
+
+	@Override
+	default Type cast(final Thing thing) {
+		return thing.accept(new Thing.Visitor<Type>() {
+			@Override
+			public Type handle(final Type that) {
+				return contains(that).branch(that, Nothing.of("Cast exception"));
+			}
+			@Override
+			public Type handle(final Thing that) {
+				return Nothing.of("Cast exception");
+			}
+		});
+	}
 
 	@Override
 	public default boolean isEvaluable() {

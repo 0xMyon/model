@@ -1,6 +1,15 @@
-package com.github.myon.model;
+package com.github.myon.model.type;
 
 import java.util.stream.Stream;
+
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Streams;
+import com.github.myon.model.Superposition;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
+import com.github.myon.model.Void;
+import com.github.myon.model.Type.Visitor;
 
 public interface UnionType extends Type {
 

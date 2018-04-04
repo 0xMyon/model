@@ -1,4 +1,10 @@
-package com.github.myon.model;
+package com.github.myon.model.type;
+
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
+import com.github.myon.model.Void;
 
 public interface ComplementType extends Type {
 
@@ -37,8 +43,6 @@ public interface ComplementType extends Type {
 			};
 		}
 	}
-
-
 
 	@Override
 	public default boolean isEvaluable() {

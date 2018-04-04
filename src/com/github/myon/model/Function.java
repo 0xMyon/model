@@ -2,9 +2,16 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
+import com.github.myon.model.function.Abstraction;
+import com.github.myon.model.function.Composition;
+import com.github.myon.model.function.Identity;
 import com.github.myon.model.function.SystemFunction;
+import com.github.myon.model.function.UnionFunction;
+import com.github.myon.model.type.FunctionType;
 
 public interface Function extends Thing {
+
+	static final Function ID = Identity.of(Type.ANYTHING);
 
 	/**
 	 * Applies parameters to the function
@@ -22,19 +29,19 @@ public interface Function extends Thing {
 	Type codomain(Type parameter);
 
 
-	default Function compose(Function that) {
-		return CompositeFunction.of(this, that);
+	default Function compose(final Function that) {
+		return Composition.of(this, that);
 	}
 	static Function Composition(final Stream<Function> composed) {
-		return composed.reduce(Function::compose).orElse(Nothing.of("TODO return ID"));
+		return composed.reduce(Function::compose).orElse(Function.ID);
 	}
-	static Function Composition(Function... composed) {
+	static Function Composition(final Function... composed) {
 		return Composition(Stream.of(composed));
 	}
-	
+
 	@Override
 	public default FunctionType typeof() {
-		return FunctionType.create(domain(), codomain());
+		return FunctionType.of(domain(), codomain());
 	}
 
 	@Override
@@ -46,13 +53,16 @@ public interface Function extends Thing {
 		default T handle(final Abstraction that) {
 			return handle((Function)that);
 		}
-		default T handle(final CompositeFunction that) {
+		default T handle(final Composition that) {
 			return handle((Function)that);
 		}
 		default T handle(final SystemFunction that)  {
 			return handle((Function)that);
 		}
 		default T handle(final UnionFunction that)  {
+			return handle((Function)that);
+		}
+		default T handle(final Identity that)  {
 			return handle((Function)that);
 		}
 

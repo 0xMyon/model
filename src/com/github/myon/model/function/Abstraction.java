@@ -1,5 +1,10 @@
-package com.github.myon.model;
+package com.github.myon.model.function;
 
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Function;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
 
 public interface Abstraction extends Function {
 

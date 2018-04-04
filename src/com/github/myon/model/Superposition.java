@@ -6,18 +6,18 @@ public interface Superposition extends Thing {
 
 	Stream<? extends Thing> superposed();
 
-	static Thing of(final Stream<Thing> superposed) {
+	static Thing of(final Stream<? extends Thing> superposed) {
 		return of(superposed.map(t -> t.accept(new Thing.Visitor<Stream<? extends Thing>>() {
 			@Override
-			public Stream<Thing> handle(Thing that) {
+			public Stream<Thing> handle(final Thing that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<Thing> handle(Nothing that) {
+			public Stream<Thing> handle(final Nothing that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<? extends Thing> handle(Superposition that) {
+			public Stream<? extends Thing> handle(final Superposition that) {
 				return that.superposed();
 			}
 		})).reduce(Stream.of(), Stream::concat).toArray(Thing[]::new));
@@ -26,7 +26,7 @@ public interface Superposition extends Thing {
 	static Thing of(final Thing... summants) {
 		switch (summants.length) {
 		case 0:
-			return Void.INSTANCE;
+			return Nothing.of("empty");
 		case 1:
 			return summants[0];
 		default:
@@ -56,6 +56,7 @@ public interface Superposition extends Thing {
 						}
 					});
 				}
+				@Override
 				public String toString() {
 					return "{"+superposed().map(Object::toString).reduce((a,b) -> a+","+b).orElse("")+"}";
 				}
@@ -77,9 +78,9 @@ public interface Superposition extends Thing {
 	default Thing evaluate() {
 		return of(superposed().map(Thing::evaluate));
 	}
-	
+
 	@Override
-	default Thing apply(Function function) {
+	default Thing apply(final Function function) {
 		return of(superposed().map(x -> x.apply(function)));
 	}
 

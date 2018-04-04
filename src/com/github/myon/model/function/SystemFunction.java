@@ -4,14 +4,14 @@ import java.lang.reflect.Method;
 
 import com.github.myon.model.Epsilon;
 import com.github.myon.model.Function;
-import com.github.myon.model.FunctionType;
-import com.github.myon.model.MetaType;
 import com.github.myon.model.Nothing;
 import com.github.myon.model.Product;
-import com.github.myon.model.ProductType;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.Void;
+import com.github.myon.model.type.FunctionType;
+import com.github.myon.model.type.MetaType;
+import com.github.myon.model.type.ProductType;
 
 public interface SystemFunction extends Function {
 	@Override
@@ -63,38 +63,38 @@ public interface SystemFunction extends Function {
 			return "typeof";
 		}
 		@Override
-		public Type codomain( final Type parameter) {
+		public Type codomain(final Type parameter) {
 			return MetaType.of(parameter);
 		}
 		@Override
 		public Type domain() {
-			return SystemType.ANYTHING;
+			return Type.ANYTHING;
 		}
 
 
 	};
-	
-	
-	static SystemFunction of(Method m) {
+
+
+	static SystemFunction of(final Method m) {
 		return new SystemFunction() {
-			
+
 			@Override
-			public Thing evaluate(Thing parameter) {
+			public Thing evaluate(final Thing parameter) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public Type domain() {
 				return null;
 			}
-			
+
 			@Override
-			public Type codomain(Type parameter) {
+			public Type codomain(final Type parameter) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public String toString() {
 				return m.getName();
@@ -111,7 +111,7 @@ public interface SystemFunction extends Function {
 
 		@Override
 		public Type domain() {
-			return FunctionType.create(SystemType.ANYTHING, SystemType.ANYTHING);
+			return FunctionType.of(Type.ANYTHING, Type.ANYTHING);
 		}
 
 		@Override
@@ -132,7 +132,7 @@ public interface SystemFunction extends Function {
 		}
 
 	};
-	
+
 	SystemFunction CODOMAIN = new SystemFunction() {
 
 		@Override
@@ -142,7 +142,7 @@ public interface SystemFunction extends Function {
 
 		@Override
 		public Type domain() {
-			return FunctionType.create(SystemType.ANYTHING, SystemType.ANYTHING);
+			return FunctionType.of(Type.ANYTHING, Type.ANYTHING);
 		}
 
 		@Override
@@ -169,7 +169,7 @@ public interface SystemFunction extends Function {
 
 		@Override
 		public Type domain() {
-			return ProductType.of(SystemType.TYPE, SystemType.ANYTHING);
+			return ProductType.of(Type.TYPE, Type.ANYTHING);
 		}
 
 		@Override
@@ -207,7 +207,7 @@ public interface SystemFunction extends Function {
 
 		@Override
 		public Type domain() {
-			return SystemType.ANYTHING;
+			return Type.ANYTHING;
 		}
 
 		@Override

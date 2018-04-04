@@ -1,8 +1,15 @@
-package com.github.myon.model;
+package com.github.myon.model.function;
 
 import java.util.stream.Stream;
 
-import com.github.myon.model.function.SystemType;
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Function;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Streams;
+import com.github.myon.model.Superposition;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
+
 
 public interface UnionFunction extends Function {
 
@@ -88,12 +95,12 @@ public interface UnionFunction extends Function {
 
 	@Override
 	default Type domain() {
-		return superposed().map(Function::domain).reduce(SystemType.ANYTHING, Type::intersect);
+		return superposed().map(Function::domain).reduce(Type.ANYTHING, Type::intersect);
 	}
 
 	@Override
 	default Type codomain( final Type parameter) {
-		return superposed().map(f -> f.codomain(parameter)).reduce(SystemType.VOID, Type::unite);
+		return superposed().map(f -> f.codomain(parameter)).reduce(Type.VOID, Type::unite);
 	}
 
 	@Override

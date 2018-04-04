@@ -1,9 +1,16 @@
-package com.github.myon.model;
+package com.github.myon.model.function;
 
 import java.util.stream.Stream;
 
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Function;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Streams;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
 
-public interface CompositeFunction extends Function {
+
+public interface Composition extends Function {
 
 	Stream<Function> elements();
 
@@ -15,7 +22,7 @@ public interface CompositeFunction extends Function {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(final CompositeFunction that) {
+			public Epsilon handle(final Composition that) {
 				return Epsilon.Conjunction();
 			}
 		});
@@ -24,15 +31,15 @@ public interface CompositeFunction extends Function {
 	static Function of(final Stream<Function> elements) {
 		return of(elements.map(t -> t.accept(new Function.Visitor<Stream<? extends Function>>() {
 			@Override
-			public Stream<Function> handle(Function that) {
+			public Stream<Function> handle(final Function that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<Function> handle(Nothing that) {
+			public Stream<Function> handle(final Nothing that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<? extends Function> handle(CompositeFunction that) {
+			public Stream<? extends Function> handle(final Composition that) {
 				return that.elements();
 			}
 		})).reduce(Stream.of(), Stream::concat).toArray(Function[]::new));
@@ -47,7 +54,7 @@ public interface CompositeFunction extends Function {
 		case 1:
 			return elements[0];
 		default:
-			return new CompositeFunction() {
+			return new Composition() {
 				@Override
 				public Stream<Function> elements() {
 					return Stream.of(elements);
@@ -68,7 +75,7 @@ public interface CompositeFunction extends Function {
 							return getClass().getName().compareTo(that.getClass().getName());
 						}
 						@Override
-						public Integer handle(final CompositeFunction that) {
+						public Integer handle(final Composition that) {
 							try {
 								return Streams.zip(elements(), that.elements(), Thing::compareTo).reduce(0, (a,b)->a+b);
 							} catch (final Nothing e) {

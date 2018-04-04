@@ -9,16 +9,16 @@ import java.util.stream.Stream;
 public interface Thing extends Comparable<Thing> {
 
 	@Override
-	default int compareTo(Thing that) {
-		int v = this.getClass().getName().compareTo(that.getClass().getName());
+	default int compareTo(final Thing that) {
+		final int v = getClass().getName().compareTo(that.getClass().getName());
 		if (0 == v) {
 			throw new Error("has to be implemented in child");
 		} else {
 			return v;
 		}
 	}
-	
-	
+
+
 	/**
 	 * @return most fitting {@link Type}
 	 */
@@ -33,8 +33,8 @@ public interface Thing extends Comparable<Thing> {
 
 
 	Thing evaluate();
-	
-	default Thing apply(Function function) {
+
+	default Thing apply(final Function function) {
 		return Application.of(function, this);
 	}
 
@@ -63,27 +63,27 @@ public interface Thing extends Comparable<Thing> {
 	/**
 	 * Superposes multiple {@link Thing}s
 	 * @param supoersosed
-	 * @return 
+	 * @return
 	 * @see #superpose(Thing)
 	 */
 	static Thing Superposition(final Stream<Thing> supoersosed) {
 		return supoersosed.reduce(Thing::superpose).orElse(Nothing.of("empty superposition"));
 	}
-	
-	static Thing Superposition(Thing... superposed) {
+
+	static Thing Superposition(final Thing... superposed) {
 		return Superposition(Stream.of(superposed));
 	}
-	
-	
+
+
 	default Thing concat(final Thing that) {
 		return Product.of(this, that);
 	}
-	
+
 	static Thing Sequence(final Stream<Thing> sequenced) {
 		return sequenced.reduce(Epsilon.INSTANCE, Thing::concat);
 	}
-	
-	
+
+
 
 	<T> T accept(final Visitor<T> visitor);
 

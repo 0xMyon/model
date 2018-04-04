@@ -119,4 +119,22 @@ public interface Epsilon extends Product {
 		return values.reduce(Nothing.of("disjoined"), Epsilon::disjoin);
 	}
 
+	@SuppressWarnings("unchecked")
+	default <T extends Thing> T branch(final T pos) {
+		return branch(pos, (T) Nothing.of(""));
+	}
+
+	default <T> T branch(final T pos, final T neg) {
+		return accept(new Visitor<T>() {
+			@Override
+			public T handle(final Epsilon that) {
+				return pos;
+			}
+			@Override
+			public T handle(final Nothing that) {
+				return neg;
+			}
+		});
+	}
+
 }

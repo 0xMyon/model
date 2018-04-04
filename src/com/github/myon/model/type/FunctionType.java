@@ -1,11 +1,17 @@
-package com.github.myon.model;
+package com.github.myon.model.type;
+
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Function;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
 
 public interface FunctionType extends Type {
 
 	Type domain();
 	Type codomain();
 
-	static FunctionType create(final Type domain, final Type codomain) {
+	static FunctionType of(final Type domain, final Type codomain) {
 		return new FunctionType() {
 			@Override
 			public Type domain() {
@@ -37,6 +43,21 @@ public interface FunctionType extends Type {
 				});
 			}
 		};
+	}
+
+
+	@Override
+	default Function cast(final Thing thing) {
+		return thing.accept(new Thing.Visitor<Function>() {
+			@Override
+			public Function handle(final Function that) {
+				return contains(that).branch(that);
+			}
+			@Override
+			public Function handle(final Thing that) {
+				return Nothing.of("Cast exception");
+			}
+		});
 	}
 
 	@Override

@@ -2,12 +2,30 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
+import com.github.myon.model.type.ComplementType;
+import com.github.myon.model.type.ConcurrencyType;
+import com.github.myon.model.type.FunctionType;
+import com.github.myon.model.type.MetaType;
+import com.github.myon.model.type.ProductType;
+import com.github.myon.model.type.UnionType;
+
 /**
  *
  * @author 0xMyon
  */
 public interface Type extends Thing {
 
+	public static final Void VOID = Void.INSTANCE;
+
+	public static final Type ANYTHING = VOID.invert();
+
+	public static final MetaType TYPE = ANYTHING.typeof();
+
+	public static FunctionType FUNCTION = FunctionType.of(ANYTHING, ANYTHING);
+
+	default Thing cast(final Thing thing) {
+		return contains(thing).branch(thing);
+	}
 
 	/**
 	 *
@@ -65,7 +83,7 @@ public interface Type extends Thing {
 		return accept((Visitor<T>)visitor);
 	}
 
-	<T>  T accept(final Visitor<T> visitor);
+	<T> T accept(final Visitor<T> visitor);
 
 	interface Visitor<T> extends Nothing.Visitor<T> {
 
@@ -90,7 +108,7 @@ public interface Type extends Thing {
 		default T handle(final ProductType that) {
 			return handle((Type)that);
 		}
-		
+
 		default T handle(final UnionType that) {
 			return handle((Type)that);
 		}

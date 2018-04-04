@@ -1,6 +1,13 @@
-package com.github.myon.model;
+package com.github.myon.model.type;
 
 import java.util.stream.Stream;
+
+import com.github.myon.model.Concurrency;
+import com.github.myon.model.Epsilon;
+import com.github.myon.model.Nothing;
+import com.github.myon.model.Streams;
+import com.github.myon.model.Thing;
+import com.github.myon.model.Type;
 
 public interface ConcurrencyType extends Type {
 
@@ -45,6 +52,24 @@ public interface ConcurrencyType extends Type {
 				}
 			};
 		}
+	}
+
+	@Override
+	default Concurrency cast(final Thing thing) {
+		return thing.accept(new Thing.Visitor<Concurrency>() {
+			@Override
+			public Concurrency handle(final Concurrency that) {
+				try {
+					return (Concurrency) Concurrency.of(Streams.zip(threads(), that.threads(), Type::cast));
+				} catch (final Nothing error) {
+					return Nothing.of("Cast exception");
+				}
+			}
+			@Override
+			public Concurrency handle(final Thing that) {
+				return Nothing.of("Cast exception");
+			}
+		});
 	}
 
 	@Override

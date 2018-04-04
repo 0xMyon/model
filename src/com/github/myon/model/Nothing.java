@@ -2,7 +2,10 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-public abstract class Nothing extends Exception implements Application, Function, Void, Epsilon, Abstraction, Superposition, UnionFunction {
+import com.github.myon.model.function.Abstraction;
+import com.github.myon.model.function.UnionFunction;
+
+public abstract class Nothing extends Exception implements Application, Function, Void, Epsilon, Abstraction, Superposition, UnionFunction, Concurrency {
 
 	private final String what;
 
@@ -140,7 +143,7 @@ public abstract class Nothing extends Exception implements Application, Function
 	}
 
 
-	static Nothing TypeMiss(final Type type, final Thing thing) {
+	public static Nothing TypeMiss(final Type type, final Thing thing) {
 		return of(thing.toString()+" is not contained in "+type.toString());
 	}
 
@@ -212,6 +215,16 @@ public abstract class Nothing extends Exception implements Application, Function
 	@Override
 	public  Stream<? extends Nothing> superposed() {
 		return Stream.of();
+	}
+
+	@Override
+	public Stream<? extends Thing> threads() {
+		return Stream.of();
+	}
+
+	@Override
+	public Nothing cast(final Thing thing) {
+		return Nothing.of("casted!!!");
 	}
 
 }

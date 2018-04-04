@@ -2,6 +2,8 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
+import com.github.myon.model.type.ProductType;
+
 public interface Product extends Thing {
 
 
