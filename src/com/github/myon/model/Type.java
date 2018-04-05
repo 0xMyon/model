@@ -1,5 +1,6 @@
 package com.github.myon.model;
 
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.github.myon.model.type.ComplementType;
@@ -21,7 +22,7 @@ public interface Type extends Thing {
 
 	public static final MetaType TYPE = ANYTHING.typeof();
 
-	public static FunctionType FUNCTION = FunctionType.of(ANYTHING, ANYTHING);
+	public static FunctionType FUNCTION = FunctionType.of(ANYTHING, Function.identity());
 
 	default Thing cast(final Thing thing) {
 		return contains(thing).branch(thing);

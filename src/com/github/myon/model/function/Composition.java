@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 import com.github.myon.model.Epsilon;
 import com.github.myon.model.Function;
 import com.github.myon.model.Nothing;
-import com.github.myon.model.Streams;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
@@ -66,23 +65,6 @@ public interface Composition extends Function {
 				@Override
 				public String toString() {
 					return elements().map(Object::toString).reduce((a,b)->a+"."+b).orElse("id");
-				}
-				@Override
-				public int compareTo(final Thing that) {
-					return that.accept(new Thing.Visitor<Integer>() {
-						@Override
-						public Integer handle(final Thing that) {
-							return getClass().getName().compareTo(that.getClass().getName());
-						}
-						@Override
-						public Integer handle(final Composition that) {
-							try {
-								return Streams.zip(elements(), that.elements(), Thing::compareTo).reduce(0, (a,b)->a+b);
-							} catch (final Nothing e) {
-								return (int) (elements().count() - that.elements().count());
-							}
-						}
-					});
 				}
 			};
 		}

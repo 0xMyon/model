@@ -41,7 +41,7 @@ public interface Function extends Thing {
 
 	@Override
 	public default FunctionType typeof() {
-		return FunctionType.of(domain(), codomain());
+		return FunctionType.of(domain(), this::codomain);
 	}
 
 	@Override

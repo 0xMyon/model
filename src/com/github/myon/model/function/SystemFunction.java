@@ -34,25 +34,6 @@ public interface SystemFunction extends Function {
 		return that == TYPEOF ? Epsilon.INSTANCE : Nothing.of("Not equal");
 	}
 
-	@Override
-	public default int compareTo(final Thing that) {
-		return that.accept(new Thing.Visitor<Integer>() {
-			@Override
-			public Integer handle(final Thing that) {
-				return getClass().getName().compareTo(that.getClass().getName());
-			}
-			@Override
-			public Integer handle(final Nothing that) {
-				return getClass().getName().compareTo(that.getClass().getName());
-			}
-			@Override
-			public Integer handle(final SystemFunction that) {
-				return hashCode() - that.hashCode();
-			}
-		});
-	}
-
-
 	SystemFunction TYPEOF = new SystemFunction() {
 		@Override
 		public Type evaluate( final Thing parameter) {
@@ -111,7 +92,7 @@ public interface SystemFunction extends Function {
 
 		@Override
 		public Type domain() {
-			return FunctionType.of(Type.ANYTHING, Type.ANYTHING);
+			return FunctionType.of(Type.ANYTHING, (final Type t)->Type.ANYTHING);
 		}
 
 		@Override
@@ -142,7 +123,7 @@ public interface SystemFunction extends Function {
 
 		@Override
 		public Type domain() {
-			return FunctionType.of(Type.ANYTHING, Type.ANYTHING);
+			return FunctionType.of(Type.ANYTHING, (final Type t)->Type.ANYTHING);
 		}
 
 		@Override

@@ -18,19 +18,6 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 		public <T> T accept(final Visitor<T> visitor) {
 			return visitor.handle(this);
 		}
-		@Override
-		public int compareTo(final Thing that) {
-			return that.accept(new Thing.Visitor<Integer>() {
-				@Override
-				public Integer handle(final Thing that) {
-					return getClass().getName().compareTo(that.getClass().getName());
-				}
-				@Override
-				public Integer handle(final Void that) {
-					return 0;
-				}
-			});
-		}
 	};
 
 	@Override
@@ -58,12 +45,12 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 	}
 
 	@Override
-	public default Type domain() {
+	public default Type codomain(final Type domain) {
 		return Nothing.of("undefined");
 	}
 
 	@Override
-	public default Type codomain() {
+	public default Type domain() {
 		return Nothing.of("undefined");
 	}
 

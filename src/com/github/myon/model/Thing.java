@@ -6,18 +6,7 @@ import java.util.stream.Stream;
  * Most abstract type
  * @author 0xMyon
  */
-public interface Thing extends Comparable<Thing> {
-
-	@Override
-	default int compareTo(final Thing that) {
-		final int v = getClass().getName().compareTo(that.getClass().getName());
-		if (0 == v) {
-			throw new Error("has to be implemented in child");
-		} else {
-			return v;
-		}
-	}
-
+public interface Thing {
 
 	/**
 	 * @return most fitting {@link Type}

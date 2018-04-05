@@ -3,13 +3,9 @@ package com.github.myon.model.type;
 import java.util.stream.Stream;
 
 import com.github.myon.model.Epsilon;
-import com.github.myon.model.Nothing;
-import com.github.myon.model.Streams;
-import com.github.myon.model.Superposition;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.Void;
-import com.github.myon.model.Type.Visitor;
 
 public interface UnionType extends Type {
 
@@ -18,15 +14,15 @@ public interface UnionType extends Type {
 	static Type of(final Stream<Type> summants) {
 		return of(summants.map(t -> t.accept(new Type.Visitor<Stream<? extends Type>>() {
 			@Override
-			public Stream<Type> handle(Type that) {
+			public Stream<Type> handle(final Type that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<Type> handle(Void that) {
+			public Stream<Type> handle(final Void that) {
 				return Stream.of();
 			}
 			@Override
-			public Stream<? extends Type> handle(UnionType that) {
+			public Stream<? extends Type> handle(final UnionType that) {
 				return that.superposed();
 			}
 		})).reduce(Stream.of(), Stream::concat).toArray(Type[]::new));
@@ -49,22 +45,6 @@ public interface UnionType extends Type {
 					return visitor.handle(this);
 				}
 				@Override
-				public int compareTo(final Thing that) {
-					return that.accept(new Thing.Visitor<Integer>() {
-						@Override
-						public Integer handle(final Thing that) {
-							return getClass().getName().compareTo(that.getClass().getName());
-						}
-						@Override
-						public Integer handle(final Superposition that) {
-							try {
-								return Streams.zip(superposed(), that.superposed(), Thing::compareTo).reduce(0, (a,b)->a+b);
-							} catch (final Nothing e) {
-								return (int) (superposed().count() - that.superposed().count());
-							}
-						}
-					});
-				}
 				public String toString() {
 					return "("+superposed().map(Thing::toString).reduce("", (a,b)->a+"++"+b)+")";
 				}

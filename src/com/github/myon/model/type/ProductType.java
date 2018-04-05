@@ -36,23 +36,6 @@ public interface ProductType extends Type {
 				public <T> T accept(final Visitor<T> visitor) {
 					return visitor.handle(this);
 				}
-				@Override
-				public int compareTo(final Thing that) {
-					return that.accept(new Thing.Visitor<Integer>() {
-						@Override
-						public Integer handle(final Thing that) {
-							return getClass().getName().compareTo(that.getClass().getName());
-						}
-						@Override
-						public Integer handle(final Product that) {
-							try {
-								return Streams.zip(factors(), that.factors(), Thing::compareTo).reduce(0, (a,b)->a+b);
-							} catch (final Nothing e) {
-								return (int) (factors().count() - that.factors().count());
-							}
-						}
-					});
-				}
 			};
 		}
 	}

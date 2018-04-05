@@ -28,23 +28,6 @@ public interface Concurrency extends Thing {
 				public Stream<Thing> threads() {
 					return Stream.of(threads);
 				}
-				@Override
-				public int compareTo(final Thing that) {
-					return that.accept(new Thing.Visitor<Integer>() {
-						@Override
-						public Integer handle(final Thing that) {
-							return getClass().getName().compareTo(that.getClass().getName());
-						}
-						@Override
-						public Integer handle(final Concurrency that) {
-							try {
-								return Streams.zip(threads(), that.threads(), Thing::compareTo).reduce(0, (a,b)->a+b);
-							} catch (final Nothing e) {
-								return (int) (threads().count() - that.threads().count());
-							}
-						}
-					});
-				}
 			};
 		}
 	}
