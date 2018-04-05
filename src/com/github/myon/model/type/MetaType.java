@@ -27,6 +27,10 @@ public interface MetaType extends Type {
 		};
 	}
 
+	@Override
+	default Class<? extends Type> c() {
+		return Type.class;
+	}
 
 	@Override
 	default Type cast(final Thing thing) {

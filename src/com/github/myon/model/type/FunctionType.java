@@ -14,23 +14,32 @@ public interface FunctionType extends Type {
 	}
 	Type codomain(Type domain);
 
+	@Override
+	default Class<? extends Function> c() {
+		return Function.class;
+	}
 
-	static FunctionType of(final Type domain, final java.util.function.Function<Type, Type> codomain) {
+	static <T extends Type> FunctionType of(final T domain, final java.util.function.Function<T, Type> codomain) {
 		return new FunctionType() {
 			@Override
-			public Type domain() {
+			public T domain() {
 				return domain;
 			}
 			@Override
+			@SuppressWarnings("unchecked")
 			public Type codomain(final Type domain) {
-				return codomain.apply(domain);
+				if (domain().c().isInstance(domain)) {
+					return codomain.apply((T)domain);
+				} else {
+					return Nothing.of("Parameter missmatch");
+				}
 			}
 			@Override
 			public String toString() {
 				return domain().toString()+"->"+codomain.toString();
 			}
 			@Override
-			public <T> T accept(final Visitor<T> visitor) {
+			public <R> R accept(final Visitor<R> visitor) {
 				return visitor.handle(this);
 			}
 		};
@@ -76,10 +85,7 @@ public interface FunctionType extends Type {
 			}
 			@Override
 			public Epsilon handle(final Function that) {
-				return Epsilon.Conjunction(
-						domain().containsAll(that.domain()),
-						codomain().containsAll(that.codomain())
-						);
+				return containsAll(that.typeof());
 			}
 		});
 	}

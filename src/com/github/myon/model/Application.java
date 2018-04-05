@@ -67,7 +67,7 @@ public interface Application extends Thing {
 
 	@Override
 	default Type typeof() {
-		return function().codomain(parameter().typeof());
+		return function().typeof().codomain(parameter().typeof());
 	}
 
 	@Override

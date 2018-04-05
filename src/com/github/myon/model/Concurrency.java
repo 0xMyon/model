@@ -4,6 +4,8 @@ import java.util.stream.Stream;
 
 import com.github.myon.model.type.ConcurrencyType;
 
+import util.Streams;
+
 public interface Concurrency extends Thing {
 
 	Stream<? extends Thing> threads();

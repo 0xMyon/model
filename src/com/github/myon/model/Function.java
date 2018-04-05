@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import com.github.myon.model.function.Abstraction;
 import com.github.myon.model.function.Composition;
+import com.github.myon.model.function.EmptyFunction;
 import com.github.myon.model.function.Identity;
 import com.github.myon.model.function.SystemFunction;
 import com.github.myon.model.function.UnionFunction;
@@ -20,6 +21,7 @@ public interface Function extends Thing {
 	 */
 	Thing evaluate(Thing parameter);
 
+	/*
 	Type domain();
 
 	default Type codomain() {
@@ -27,7 +29,7 @@ public interface Function extends Thing {
 	}
 
 	Type codomain(Type parameter);
-
+	 */
 
 	default Function compose(final Function that) {
 		return Composition.of(this, that);
@@ -40,9 +42,7 @@ public interface Function extends Thing {
 	}
 
 	@Override
-	public default FunctionType typeof() {
-		return FunctionType.of(domain(), this::codomain);
-	}
+	FunctionType typeof();
 
 	@Override
 	Function evaluate();
@@ -63,6 +63,9 @@ public interface Function extends Thing {
 			return handle((Function)that);
 		}
 		default T handle(final Identity that)  {
+			return handle((Function)that);
+		}
+		default T handle(final EmptyFunction that)  {
 			return handle((Function)that);
 		}
 

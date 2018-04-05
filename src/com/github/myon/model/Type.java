@@ -22,10 +22,17 @@ public interface Type extends Thing {
 
 	public static final MetaType TYPE = ANYTHING.typeof();
 
+	public static final Type EPSILON = Epsilon.INSTANCE.typeof();
+
 	public static FunctionType FUNCTION = FunctionType.of(ANYTHING, Function.identity());
 
 	default Thing cast(final Thing thing) {
 		return contains(thing).branch(thing);
+	}
+
+
+	default Class<? extends Thing> c() {
+		return Thing.class;
 	}
 
 	/**

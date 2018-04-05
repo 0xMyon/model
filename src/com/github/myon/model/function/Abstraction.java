@@ -5,6 +5,7 @@ import com.github.myon.model.Function;
 import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
+import com.github.myon.model.type.FunctionType;
 
 public interface Abstraction extends Function {
 
@@ -24,12 +25,12 @@ public interface Abstraction extends Function {
 						return implementation;
 					}
 					@Override
-					public Type domain() {
-						return domain;
-					}
-					@Override
 					public <T> T accept(final Function.Visitor<T> visitor) {
 						return visitor.handle(this);
+					}
+					@Override
+					public FunctionType typeof() {
+						return FunctionType.of(domain.evaluate(), t -> implementation.typeof().codomain(t));
 					}
 				};
 			}
@@ -49,7 +50,6 @@ public interface Abstraction extends Function {
 			@Override
 			public Epsilon handle(final Abstraction that) {
 				return Epsilon.Conjunction(
-						domain().isEqual(that.domain()),
 						implementation().isEqual(that.implementation())
 						);
 			}
@@ -58,19 +58,12 @@ public interface Abstraction extends Function {
 
 	@Override
 	default boolean isEvaluable() {
-		return domain().isEvaluable() || implementation().isEvaluable();
+		return implementation().isEvaluable();
 	}
-
-
 
 	@Override
 	default Function evaluate() {
-		return of(domain().evaluate(), implementation().evaluate());
-	}
-
-	@Override
-	default Type codomain(final Type parameter) {
-		return implementation().codomain(parameter);
+		return of(typeof().domain(), implementation().evaluate());
 	}
 
 	@Override

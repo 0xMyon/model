@@ -8,7 +8,6 @@ import com.github.myon.model.Nothing;
 import com.github.myon.model.Product;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
-import com.github.myon.model.Void;
 import com.github.myon.model.type.FunctionType;
 import com.github.myon.model.type.MetaType;
 import com.github.myon.model.type.ProductType;
@@ -44,12 +43,8 @@ public interface SystemFunction extends Function {
 			return "typeof";
 		}
 		@Override
-		public Type codomain(final Type parameter) {
-			return MetaType.of(parameter);
-		}
-		@Override
-		public Type domain() {
-			return Type.ANYTHING;
+		public FunctionType typeof() {
+			return FunctionType.of(Type.ANYTHING, MetaType::of);
 		}
 
 
@@ -66,13 +61,7 @@ public interface SystemFunction extends Function {
 			}
 
 			@Override
-			public Type domain() {
-				return null;
-			}
-
-			@Override
-			public Type codomain(final Type parameter) {
-				// TODO Auto-generated method stub
+			public FunctionType typeof() {
 				return null;
 			}
 
@@ -91,25 +80,13 @@ public interface SystemFunction extends Function {
 		}
 
 		@Override
-		public Type domain() {
-			return FunctionType.of(Type.ANYTHING, (final Type t)->Type.ANYTHING);
+		public FunctionType typeof() {
+			return FunctionType.of(Type.FUNCTION, FunctionType::domain);
 		}
-
-		@Override
-		public Type codomain(final Type parameter) {
-			if (parameter instanceof FunctionType) {
-				return ((FunctionType)parameter).domain();
-			}
-			return Nothing.of("expected FunctionType");
-		}
-
 
 		@Override
 		public Thing evaluate(final Thing parameter) {
-			if (parameter instanceof Function) {
-				return ((Function)parameter).domain();
-			}
-			return Nothing.of("expected Function");
+			return Type.FUNCTION.cast(parameter).typeof().domain();
 		}
 
 	};
@@ -122,25 +99,13 @@ public interface SystemFunction extends Function {
 		}
 
 		@Override
-		public Type domain() {
-			return FunctionType.of(Type.ANYTHING, (final Type t)->Type.ANYTHING);
+		public FunctionType typeof() {
+			return FunctionType.of(FunctionType.of(ProductType.of(Type.TYPE, Type.ANYTHING), t->Type.TYPE), FunctionType::codomain);
 		}
-
-		@Override
-		public Type codomain(final Type parameter) {
-			if (parameter instanceof FunctionType) {
-				return ((FunctionType)parameter).codomain();
-			}
-			return Nothing.of("expected FunctionType");
-		}
-
 
 		@Override
 		public Thing evaluate(final Thing parameter) {
-			if (parameter instanceof Function) {
-				return ((Function)parameter).codomain();
-			}
-			return Nothing.of("expected Function");
+			return Type.FUNCTION.cast(parameter).typeof().codomain();
 		}
 
 	};
@@ -149,24 +114,13 @@ public interface SystemFunction extends Function {
 	SystemFunction CONTAINS = new SystemFunction() {
 
 		@Override
-		public Type domain() {
-			return ProductType.of(Type.TYPE, Type.ANYTHING);
+		public FunctionType typeof() {
+			return FunctionType.of(ProductType.of(Type.TYPE, Type.ANYTHING), t->Type.EPSILON);
 		}
 
 		@Override
-		public Type codomain( final Type parameter) {
-			if (parameter instanceof ProductType) {
-				final ProductType p = (ProductType) parameter;
-				if (p.factors().count() == 2) {
-					return ProductType.of();
-				}
-			}
-			return Void.INSTANCE;
-		}
-
-
-		@Override
-		public Thing evaluate( final Thing parameter) {
+		public Thing evaluate(final Thing parameter) {
+			typeof().domain().cast(parameter);
 			if (parameter instanceof Product) {
 				final Product p = (Product) parameter;
 				if (p.factors().count() == 2) {
@@ -187,15 +141,9 @@ public interface SystemFunction extends Function {
 	SystemFunction ID = new SystemFunction() {
 
 		@Override
-		public Type domain() {
-			return Type.ANYTHING;
+		public FunctionType typeof() {
+			return FunctionType.of(Type.ANYTHING, t->t);
 		}
-
-		@Override
-		public Type codomain( final Type parameter) {
-			return parameter;
-		}
-
 
 		@Override
 		public Thing evaluate( final Thing parameter) {

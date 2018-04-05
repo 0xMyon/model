@@ -7,11 +7,12 @@ import com.github.myon.model.Function;
 import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
+import com.github.myon.model.type.FunctionType;
 
 
 public interface Composition extends Function {
 
-	Stream<Function> elements();
+	Stream<? extends Function> elements();
 
 	@Override
 	default Epsilon isEqual(final Thing that) {
@@ -66,6 +67,7 @@ public interface Composition extends Function {
 				public String toString() {
 					return elements().map(Object::toString).reduce((a,b)->a+"."+b).orElse("id");
 				}
+
 			};
 		}
 	}
@@ -76,12 +78,16 @@ public interface Composition extends Function {
 		return elements().anyMatch(Function::isEvaluable);
 	}
 
-
 	@Override
-	public default Type domain() {
-		// TODO maybe return void
-		return elements().findFirst().orElse(Nothing.of("empty")).domain();
+	default FunctionType typeof() {
+		return FunctionType.of(
+				elements().<Function>map(t->t).findFirst().orElse(Nothing.of("empty")).typeof().domain(),
+				(final Type parameter) ->
+				elements().map(Function::typeof).<java.util.function.Function<Type,Type>>map(f -> f::codomain )
+				.reduce(java.util.function.Function::andThen).orElse(t -> t).apply(parameter)
+				);
 	}
+
 
 	@Override
 	public
@@ -89,13 +95,6 @@ public interface Composition extends Function {
 		return of(elements().map(Function::evaluate));
 	}
 
-	//TODO extract reduce
-
-	@Override
-	public default Type codomain(final Type parameter) {
-		return elements().<java.util.function.Function<Type,Type>>map(f -> f::codomain )
-				.reduce(java.util.function.Function::andThen).orElse(t -> t).apply(parameter);
-	}
 
 	@Override
 	public default Thing evaluate(final Thing parameter) {

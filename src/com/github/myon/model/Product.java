@@ -54,7 +54,7 @@ public interface Product extends Thing {
 	Stream<? extends Thing> factors();
 
 	@Override
-	public default  Type typeof() {
+	public default Type typeof() {
 		return ProductType.of(factors().map(Thing::typeof));
 	}
 

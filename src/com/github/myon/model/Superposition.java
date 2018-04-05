@@ -2,6 +2,8 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
+import util.Streams;
+
 public interface Superposition extends Thing {
 
 	Stream<? extends Thing> superposed();

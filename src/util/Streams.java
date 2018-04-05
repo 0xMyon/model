@@ -1,4 +1,4 @@
-package com.github.myon.model;
+package util;
 
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -7,6 +7,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import com.github.myon.model.Nothing;
 
 public class Streams {
 

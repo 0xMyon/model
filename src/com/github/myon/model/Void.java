@@ -9,6 +9,11 @@ import com.github.myon.model.type.UnionType;
 
 public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 
+	@Override
+	default Class<? extends Nothing> c() {
+		return Nothing.class;
+	}
+
 	static Void INSTANCE = new Void() {
 		@Override
 		public String toString() {

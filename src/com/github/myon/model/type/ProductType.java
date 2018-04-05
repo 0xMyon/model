@@ -5,9 +5,10 @@ import java.util.stream.Stream;
 import com.github.myon.model.Epsilon;
 import com.github.myon.model.Nothing;
 import com.github.myon.model.Product;
-import com.github.myon.model.Streams;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
+
+import util.Streams;
 
 public interface ProductType extends Type {
 
