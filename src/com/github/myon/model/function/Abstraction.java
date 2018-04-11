@@ -7,21 +7,24 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.type.FunctionType;
 
-public interface Abstraction extends Function {
+public interface Abstraction<DOMAIN extends Thing, CODOMAIN extends Thing> extends Function<DOMAIN, CODOMAIN> {
 
-	Function implementation();
+	Function<? super DOMAIN, ? extends CODOMAIN> implementation();
 
-	static Abstraction of(final Type domain, final Function implementation) {
-		return implementation.typeof().domain().containsAll(domain).accept(new Epsilon.Visitor<Abstraction>() {
+	static <DOMAIN extends Thing, CODOMAIN extends Thing>
+	Abstraction<? super DOMAIN, ? extends CODOMAIN> of(
+			final Type domain,
+			final Function<? super DOMAIN, ? extends CODOMAIN> implementation) {
+		return implementation.typeof().domain().containsAll(domain).accept(new Epsilon.Visitor<Abstraction<? super DOMAIN, ? extends CODOMAIN>>() {
 			@Override
-			public Abstraction handle(final Nothing that) {
-				return that;
+			public Abstraction<? super DOMAIN, ? extends CODOMAIN> handle(final Nothing that) {
+				return (Abstraction<? super DOMAIN, ? extends CODOMAIN>) that;
 			}
 			@Override
-			public Abstraction handle(final Epsilon that) {
-				return new Abstraction() {
+			public Abstraction<DOMAIN, CODOMAIN> handle(final Epsilon that) {
+				return new Abstraction<DOMAIN, CODOMAIN>() {
 					@Override
-					public Function implementation() {
+					public Function<? super DOMAIN, ? extends CODOMAIN> implementation() {
 						return implementation;
 					}
 					@Override
@@ -48,7 +51,7 @@ public interface Abstraction extends Function {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(final Abstraction that) {
+			public Epsilon handle(final Abstraction<? extends Thing, ? extends Thing> that) {
 				return Epsilon.Conjunction(
 						implementation().isEqual(that.implementation())
 						);
@@ -62,12 +65,12 @@ public interface Abstraction extends Function {
 	}
 
 	@Override
-	default Function evaluate() {
+	default Abstraction<? super DOMAIN, ? extends CODOMAIN> evaluate() {
 		return of(typeof().domain(), implementation().evaluate());
 	}
 
 	@Override
-	default Thing evaluate(final Thing parameter) {
+	default CODOMAIN evaluate(final DOMAIN parameter) {
 		return implementation().evaluate(parameter);
 	}
 

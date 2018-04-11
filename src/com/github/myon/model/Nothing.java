@@ -2,10 +2,9 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-import com.github.myon.model.function.Abstraction;
-import com.github.myon.model.function.UnionFunction;
+import com.github.myon.model.function.EmptyFunction;
 
-public abstract class Nothing extends Exception implements Application, Function, Void, Epsilon, Abstraction, Superposition, UnionFunction, Concurrency {
+public abstract class Nothing extends Exception implements Application<Thing,Nothing>, EmptyFunction<Thing>, Void, Epsilon, Superposition, Concurrency {
 
 	private final String what;
 
@@ -31,9 +30,10 @@ public abstract class Nothing extends Exception implements Application, Function
 	}
 
 	@Override
-	public Function implementation() {
+	public Nothing implementation() {
 		return this;
 	}
+
 	static class Uncaused extends Nothing {
 
 
@@ -159,7 +159,7 @@ public abstract class Nothing extends Exception implements Application, Function
 
 
 	@Override
-	public Thing evaluate( final Thing parameter) {
+	public Nothing evaluate( final Thing parameter) {
 		return of("Function 'apply' is not defined on type 'Nothing'");
 	}
 

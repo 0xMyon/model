@@ -5,45 +5,35 @@ package com.github.myon.model;
  * @author 0xMyon
  *
  */
-public interface Application extends Thing {
+public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> extends Thing {
 
-	Function function();
-	Thing parameter();
+	Function<? super DOMAIN, ? extends CODOMAIN> function();
+	DOMAIN parameter();
 
-	static Application of(final Function function, final Thing parameter) {
-		return function.typeof().domain().containsAll(parameter.typeof()).accept(new Epsilon.Visitor<Application>() {
-
+	static <DOMAIN extends Thing, CODOMAIN extends Thing>
+	Application<? super DOMAIN, ? extends CODOMAIN> of(final Function<? super DOMAIN, ? extends CODOMAIN> function, final DOMAIN parameter) {
+		return new Application<DOMAIN, CODOMAIN>() {
 			@Override
-			public Application handle(final Nothing cause) {
-				return Nothing.of("Type missmatch "+function.typeof().domain().toString()+" !>>> "+parameter.typeof().toString(), cause);
+			public DOMAIN parameter() {
+				return parameter;
 			}
 
 			@Override
-			public Application handle(final Epsilon that) {
-				return new Application() {
-					@Override
-					public Thing parameter() {
-						return parameter;
-					}
-
-					@Override
-					public Function function() {
-						return function;
-					}
-					@Override
-					public String toString() {
-						return function().toString()+"("+parameter().toString()+")";
-					}
-
-					@Override
-					public <T> T accept(final Visitor<T> visitor) {
-						return visitor.handle(this);
-					}
-				};
+			public Function<? super DOMAIN, ? extends CODOMAIN> function() {
+				return function;
+			}
+			@Override
+			public String toString() {
+				return function().toString()+"("+parameter().toString()+")";
 			}
 
+			@Override
+			public <T> T accept(final Visitor<T> visitor) {
+				return visitor.handle(this);
+			}
+		};
 
-		});
+
 	}
 
 

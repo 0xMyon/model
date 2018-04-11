@@ -1,18 +1,19 @@
 package com.github.myon.model.function;
 
-import java.util.stream.Stream;
-
 import com.github.myon.model.Epsilon;
 import com.github.myon.model.Function;
 import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
-import com.github.myon.model.Type;
 import com.github.myon.model.type.FunctionType;
 
 
-public interface Composition extends Function {
+public interface Composition<DOMAIN extends Thing, TYPE extends Thing, CODOMAIN extends Thing> extends Function<DOMAIN, CODOMAIN> {
 
-	Stream<? extends Function> elements();
+	//Stream<? extends Function> elements();
+
+	Function<? super DOMAIN, ? extends TYPE> first();
+	Function<? super TYPE, ? extends CODOMAIN> second();
+
 
 	@Override
 	default Epsilon isEqual(final Thing that) {
@@ -22,84 +23,61 @@ public interface Composition extends Function {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(final Composition that) {
+			public Epsilon handle(final Composition<?,?,?> that) {
 				return Epsilon.Conjunction();
 			}
 		});
 	}
 
-	static Function of(final Stream<Function> elements) {
-		return of(elements.map(t -> t.accept(new Function.Visitor<Stream<? extends Function>>() {
-			@Override
-			public Stream<Function> handle(final Function that) {
-				return Stream.of(that);
-			}
-			@Override
-			public Stream<Function> handle(final Nothing that) {
-				return Stream.of(that);
-			}
-			@Override
-			public Stream<? extends Function> handle(final Composition that) {
-				return that.elements();
-			}
-		})).reduce(Stream.of(), Stream::concat).toArray(Function[]::new));
-		//return of(elements.toArray(Function[]::new));
-	}
+	static <DOMAIN extends Thing, TYPE extends Thing, CODOMAIN extends Thing> Function<? super DOMAIN, ? extends CODOMAIN>
+	of(final Function<? super DOMAIN, ? extends TYPE> first, final Function<? super TYPE, ? extends CODOMAIN> second) {
+		return new Composition<DOMAIN,TYPE,CODOMAIN>() {
 
-	static Function of(final Function... elements) {
-		// TODO check of composition is possible
-		switch (elements.length) {
-		case 0:
-			return Nothing.of("no composed functions of 0 elements");
-		case 1:
-			return elements[0];
-		default:
-			return new Composition() {
-				@Override
-				public Stream<Function> elements() {
-					return Stream.of(elements);
-				}
-				@Override
-				public <T> T accept(final Visitor<T> visitor) {
-					return visitor.handle(this);
-				}
-				@Override
-				public String toString() {
-					return elements().map(Object::toString).reduce((a,b)->a+"."+b).orElse("id");
-				}
+			@Override
+			public Function<? super DOMAIN, ? extends TYPE> first() {
+				return first;
+			}
+			@Override
+			public Function<? super TYPE, ? extends CODOMAIN> second() {
+				return second;
+			}
 
-			};
-		}
+			@Override
+			public <T> T accept(final Visitor<T> visitor) {
+				return visitor.handle(this);
+			}
+			@Override
+			public String toString() {
+				return first.toString()+"."+second.toString();
+			}
+		};
+
 	}
 
 
 	@Override
 	public default boolean isEvaluable() {
-		return elements().anyMatch(Function::isEvaluable);
+		return first().isEvaluable() || second().isEvaluable();
 	}
 
 	@Override
 	default FunctionType typeof() {
 		return FunctionType.of(
-				elements().<Function>map(t->t).findFirst().orElse(Nothing.of("empty")).typeof().domain(),
-				(final Type parameter) ->
-				elements().map(Function::typeof).<java.util.function.Function<Type,Type>>map(f -> f::codomain )
-				.reduce(java.util.function.Function::andThen).orElse(t -> t).apply(parameter)
+				first().typeof().domain(), t -> second().typeof().codomain(first().typeof().codomain(t))
 				);
 	}
 
 
 	@Override
 	public
-	default Function evaluate() {
-		return of(elements().map(Function::evaluate));
+	default Function<? super DOMAIN, ? extends CODOMAIN> evaluate() {
+		return of(first().evaluate(), second().evaluate());
 	}
 
 
 	@Override
-	public default Thing evaluate(final Thing parameter) {
-		return elements().<java.util.function.Function<Thing,Thing>>map(f -> f::evaluate )
-				.reduce(java.util.function.Function::andThen).orElse(t -> t).apply(parameter);
+	public default CODOMAIN evaluate(final DOMAIN parameter) {
+		return second().evaluate(first().evaluate(parameter));
 	}
 
 

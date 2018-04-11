@@ -47,14 +47,14 @@ public interface FunctionType extends Type {
 
 
 	@Override
-	default Function cast(final Thing thing) {
-		return thing.accept(new Thing.Visitor<Function>() {
+	default Function<? extends Thing, ? extends Thing> cast(final Thing thing) {
+		return thing.accept(new Thing.Visitor<Function<? extends Thing, ? extends Thing>>() {
 			@Override
-			public Function handle(final Function that) {
+			public Function<? extends Thing, ? extends Thing> handle(final Function<? extends Thing, ? extends Thing> that) {
 				return contains(that).branch(that);
 			}
 			@Override
-			public Function handle(final Thing that) {
+			public Function<? extends Thing, ? extends Thing> handle(final Thing that) {
 				return Nothing.of("Cast exception");
 			}
 		});

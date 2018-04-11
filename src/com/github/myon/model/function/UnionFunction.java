@@ -13,24 +13,25 @@ import com.github.myon.model.type.FunctionType;
 import util.Streams;
 
 
-public interface UnionFunction extends Function {
+public interface UnionFunction<DOMAIN extends Thing, CODOMAIN extends Thing> extends Function<DOMAIN, CODOMAIN> {
 
-	Stream<? extends Function> superposed();
+	Stream<? extends Function<? super DOMAIN, ? extends CODOMAIN>> superposed();
 
-	static Function of(final Stream<Function> summants) {
+	static <DOMAIN extends Thing, CODOMAIN extends Thing> Function<? super DOMAIN, ? extends CODOMAIN> of(final Stream<Function<? super DOMAIN, ? extends CODOMAIN>> summants) {
 		return of(summants.toArray(Function[]::new));
 	}
 
-	static Function of(final  Function... summants) {
+	@SafeVarargs
+	static <DOMAIN extends Thing, CODOMAIN extends Thing> Function<? super DOMAIN, ? extends CODOMAIN> of(final  Function<? super DOMAIN, ? extends CODOMAIN>... summants) {
 		switch (summants.length) {
 		case 0:
 			throw new Error("return empty function here");
 		case 1:
 			return summants[0];
 		default:
-			return new UnionFunction() {
+			return new UnionFunction<DOMAIN, CODOMAIN>() {
 				@Override
-				public  Stream<Function> superposed() {
+				public  Stream<Function<? super DOMAIN, ? extends CODOMAIN>> superposed() {
 					//TODO sort & eliminate doubles & reduce nested Unions
 					return Stream.of(summants).distinct();
 				}
@@ -70,7 +71,7 @@ public interface UnionFunction extends Function {
 				return Nothing.of("not equal");
 			}
 			@Override
-			public  Epsilon handle(final UnionFunction that) {
+			public Epsilon handle(final UnionFunction<?,?> that) {
 				try {
 					return Epsilon.Conjunction(Streams.zip(superposed(), that.superposed(), Function::isEqual));
 				} catch (final Nothing e) {
@@ -81,13 +82,13 @@ public interface UnionFunction extends Function {
 	}
 
 	@Override
-	default Function evaluate() {
+	default Function<? super DOMAIN, ? extends CODOMAIN> evaluate() {
 		return of(superposed().map(Function::evaluate));
 	}
 
 	@Override
-	default Thing evaluate( final Thing parameter) {
-		return Superposition.of(superposed().map(f -> f.evaluate(parameter)));
+	default CODOMAIN evaluate( final DOMAIN parameter) {
+		return (CODOMAIN) Superposition.of(superposed().map(f -> f.evaluate(parameter)));
 	}
 
 }

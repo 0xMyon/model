@@ -31,6 +31,8 @@ public interface Type extends Thing {
 	}
 
 
+
+
 	default Class<? extends Thing> c() {
 		return Thing.class;
 	}
