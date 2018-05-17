@@ -5,14 +5,14 @@ import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
-public interface MetaType extends Type {
+public interface MetaType<BASE extends Type> extends Type {
 
-	Type base();
+	BASE base();
 
-	static MetaType of(final Type base) {
-		return new MetaType() {
+	static <BASE extends Type> MetaType<BASE> of(final BASE base) {
+		return new MetaType<BASE>() {
 			@Override
-			public Type base() {
+			public BASE base() {
 				return base;
 			}
 			@Override

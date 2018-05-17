@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import com.github.myon.model.type.ComplementType;
 import com.github.myon.model.type.ConcurrencyType;
 import com.github.myon.model.type.FunctionType;
+import com.github.myon.model.type.IMetaType;
 import com.github.myon.model.type.MetaType;
 import com.github.myon.model.type.ProductType;
 import com.github.myon.model.type.UnionType;
@@ -45,8 +46,8 @@ public interface Type extends Thing {
 	Epsilon contains(final Thing thing);
 
 	@Override
-	default MetaType typeof() {
-		return MetaType.of(this);
+	default IMetaType typeof() {
+		return IMetaType.of(this);
 	}
 
 	@Override

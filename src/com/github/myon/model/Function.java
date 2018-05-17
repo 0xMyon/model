@@ -12,7 +12,7 @@ import com.github.myon.model.type.FunctionType;
 
 public interface Function<DOMAIN extends Thing, CODOMAIN extends Thing> extends Thing {
 
-	static final Function ID = Identity.of(Type.ANYTHING);
+	static final Function<? super Thing,? extends Thing> ID = Identity.of(Type.ANYTHING);
 
 	/**
 	 * Applies parameters to the function
@@ -21,13 +21,18 @@ public interface Function<DOMAIN extends Thing, CODOMAIN extends Thing> extends 
 	 */
 	CODOMAIN evaluate(final DOMAIN parameter);
 
-	default Function compose(final Function that) {
-		return Composition.of(this, that);
+
+	default <COCODOMAIN extends Thing>
+	Function<? super DOMAIN, ? extends COCODOMAIN> compose(final Function<? super CODOMAIN, ? extends COCODOMAIN> that) {
+		return Composition.of(this.evaluate(), that);
 	}
-	static Function Composition(final Stream<Function> composed) {
-		return composed.reduce(Function::compose).orElse(Function.ID);
+
+	static Function<? super Thing,? extends Thing> Composition(final Stream<Function<? super Thing, ? extends Thing>> composed) {
+		return composed.reduce(Function<? super Thing,? extends Thing>::compose).orElse(Function.ID);
 	}
-	static Function Composition(final Function... composed) {
+
+	@SafeVarargs
+	static Function<? super Thing,? extends Thing> Composition(final Function<? super Thing,? extends Thing>... composed) {
 		return Composition(Stream.of(composed));
 	}
 
@@ -37,26 +42,27 @@ public interface Function<DOMAIN extends Thing, CODOMAIN extends Thing> extends 
 	@Override
 	Function<? super DOMAIN, ? extends CODOMAIN> evaluate();
 
-	interface Visitor<T> extends Nothing.Visitor<T> {
-		T handle(Function<? extends Thing, ? extends Thing> that);
 
-		default T handle(final Abstraction<? extends Thing, ? extends Thing> that) {
-			return handle((Function<? extends Thing, ? extends Thing>)that);
+	interface Visitor<T, DOMAIN extends Thing, CODOMAIN extends Thing> extends Nothing.Visitor<T> {
+		T handle(Function<? super DOMAIN, ? extends CODOMAIN> that);
+
+		default T handle(final Abstraction<DOMAIN, ? extends Thing> that) {
+			return handle((Function<? super DOMAIN, ? extends CODOMAIN>)that);
 		}
-		default T handle(final Composition<? extends Thing, ? extends Thing, ? extends Thing> that) {
-			return handle((Function<? extends Thing, ? extends Thing>)that);
+		default T handle(final Composition<? super DOMAIN, ?, ? extends CODOMAIN> that) {
+			return handle((Function<? super DOMAIN, ? extends CODOMAIN>)that);
 		}
 		default T handle(final SystemFunction<? extends Thing, ? extends Thing> that)  {
-			return handle((Function<? extends Thing, ? extends Thing>)that);
+			return handle((Function<? super DOMAIN, ? extends CODOMAIN>)that);
 		}
 		default T handle(final UnionFunction<? extends Thing, ? extends Thing> that)  {
-			return handle((Function<? extends Thing, ? extends Thing>)that);
+			return handle((Function<? super DOMAIN, ? extends CODOMAIN>)that);
 		}
-		default T handle(final Identity<? extends Thing> that)  {
-			return handle((Function<? extends Thing, ? extends Thing>)that);
+		default T handle(final Identity<DOMAIN> that)  {
+			return handle((Function<? super DOMAIN, ? extends CODOMAIN>)that);
 		}
-		default T handle(final EmptyFunction<? extends Thing> that)  {
-			return handle((Function<? extends Thing, ? extends Thing>)that);
+		default T handle(final EmptyFunction<DOMAIN> that)  {
+			return handle((Function<? super DOMAIN, ? extends CODOMAIN>)that);
 		}
 
 		@Override
@@ -67,11 +73,12 @@ public interface Function<DOMAIN extends Thing, CODOMAIN extends Thing> extends 
 
 	}
 
+
 	@Override
 	default  <T> T accept(final Thing.Visitor<T> visitor) {
-		return accept((Visitor<T>)visitor);
+		return accept(visitor);
 	}
 
-	<T> T accept(final Visitor<T> visitor);
+	<T> T accept(final Visitor<T,DOMAIN,CODOMAIN> visitor);
 
 }

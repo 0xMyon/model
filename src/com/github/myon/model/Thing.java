@@ -24,8 +24,11 @@ public interface Thing {
 	Thing evaluate();
 
 
-	default Thing apply(final Function function) {
-		return Application.of(function, this);
+	default <CODOMAIN extends Thing> Thing apply(
+			final Function<Thing, CODOMAIN> function
+			)
+	{
+		return Application.<Thing,CODOMAIN>of(function, this);
 	}
 
 	boolean isEvaluable();
@@ -73,9 +76,10 @@ public interface Thing {
 		return sequenced.reduce(Epsilon.INSTANCE, Thing::concat);
 	}
 
+
 	<T> T accept(final Visitor<T> visitor);
 
-	static interface Visitor<T> extends Type.Visitor<T>, Epsilon.Visitor<T>, Function.Visitor<T> {
+	static interface Visitor<T> extends Type.Visitor<T>, Epsilon.Visitor<T>, Function.Visitor<T,Thing,Thing> {
 
 		T handle(final Thing that);
 
@@ -85,7 +89,7 @@ public interface Thing {
 		}
 
 		@Override
-		default T handle(final Function<? extends Thing, ? extends Thing> that)  {
+		default T handle(final Function<? super Thing, ? extends Thing> that)  {
 			return handle((Thing)that);
 		}
 
@@ -106,7 +110,7 @@ public interface Thing {
 			return handle((Thing)that);
 		}
 
-		default T handle(final Application that)  {
+		default T handle(final Application<?,?> that)  {
 			return handle((Thing)that);
 		}
 
@@ -117,5 +121,6 @@ public interface Thing {
 		}
 
 	}
+
 
 }

@@ -23,13 +23,14 @@ public interface Composition<DOMAIN extends Thing, TYPE extends Thing, CODOMAIN 
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(final Composition<?,?,?> that) {
+			public Epsilon handle(final Composition<? super Thing,?,? extends Thing> that) {
 				return Epsilon.Conjunction();
 			}
 		});
 	}
 
-	static <DOMAIN extends Thing, TYPE extends Thing, CODOMAIN extends Thing> Function<? super DOMAIN, ? extends CODOMAIN>
+	static <DOMAIN extends Thing, TYPE extends Thing, CODOMAIN extends Thing>
+	Function<? super DOMAIN, ? extends CODOMAIN>
 	of(final Function<? super DOMAIN, ? extends TYPE> first, final Function<? super TYPE, ? extends CODOMAIN> second) {
 		return new Composition<DOMAIN,TYPE,CODOMAIN>() {
 
@@ -43,7 +44,7 @@ public interface Composition<DOMAIN extends Thing, TYPE extends Thing, CODOMAIN 
 			}
 
 			@Override
-			public <T> T accept(final Visitor<T> visitor) {
+			public <T> T accept(final Visitor<T,DOMAIN,CODOMAIN> visitor) {
 				return visitor.handle(this);
 			}
 			@Override

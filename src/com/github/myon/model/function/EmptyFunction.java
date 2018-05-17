@@ -31,7 +31,7 @@ public interface EmptyFunction<DOMAIN extends Thing> extends Composition<DOMAIN,
 	static <DOMAIN extends Thing, CODOMAIN extends Thing> EmptyFunction<? super DOMAIN> of() {
 		return new EmptyFunction<DOMAIN>() {
 			@Override
-			public <T> T accept(final Visitor<T> visitor) {
+			public <T> T accept(final Visitor<T,DOMAIN,Nothing> visitor) {
 				return visitor.handle(this);
 			}
 		};

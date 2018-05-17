@@ -37,7 +37,7 @@ public interface Identity<TYPE extends Thing> extends Function<TYPE, TYPE> {
 		return new Identity<TYPE>() {
 
 			@Override
-			public <T> T accept(final Visitor<T> visitor) {
+			public <T> T accept(final Visitor<T,TYPE,TYPE> visitor) {
 				return visitor.handle(this);
 			}
 

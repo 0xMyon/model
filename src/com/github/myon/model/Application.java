@@ -11,11 +11,12 @@ public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> exten
 	DOMAIN parameter();
 
 	static <DOMAIN extends Thing, CODOMAIN extends Thing>
-	Application<? super DOMAIN, ? extends CODOMAIN> of(final Function<? super DOMAIN, ? extends CODOMAIN> function, final DOMAIN parameter) {
+	Thing
+	of(final Function<? super DOMAIN, ? extends CODOMAIN> function, final DOMAIN thing) {
 		return new Application<DOMAIN, CODOMAIN>() {
 			@Override
 			public DOMAIN parameter() {
-				return parameter;
+				return thing;
 			}
 
 			@Override
@@ -31,6 +32,8 @@ public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> exten
 			public <T> T accept(final Visitor<T> visitor) {
 				return visitor.handle(this);
 			}
+
+
 		};
 
 
@@ -39,19 +42,7 @@ public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> exten
 
 	@Override
 	default Epsilon isEqual(final Thing that) {
-		return that.accept(new Thing.Visitor<Epsilon>() {
-			@Override
-			public Epsilon handle(final Thing that) {
-				return Nothing.of("unequal");
-			}
-			@Override
-			public Epsilon handle(final Application that) {
-				return Epsilon.Conjunction(
-						function().isEqual(that.function()),
-						parameter().isEqual(that.parameter())
-						);
-			}
-		});
+		return null;
 	}
 
 
@@ -66,26 +57,13 @@ public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> exten
 	}
 
 	@Override
-	public default Thing evaluate() {
+	public default CODOMAIN evaluate() {
 		if (function().isEvaluable()) {
 			return of(function().evaluate(), parameter());
 		} else if (parameter().isEvaluable()) {
-			return of(function(), parameter().evaluate());
+			return of(function(), parameter());
 		} else {
-			return parameter().accept(new Thing.Visitor<Thing>() {
-				@Override
-				public Thing handle(final Thing that) {
-					return function().evaluate(parameter());
-				}
-				@Override
-				public Thing handle(final Nothing that) {
-					return function().evaluate(parameter());
-				}
-				@Override
-				public Thing handle(final Superposition that) {
-					return Thing.Superposition(that.superposed().map(function()::evaluate));
-				}
-			});
+			return function().evaluate(parameter());
 		}
 	}
 
