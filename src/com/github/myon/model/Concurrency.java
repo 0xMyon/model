@@ -6,34 +6,48 @@ import com.github.myon.model.type.ConcurrencyType;
 
 import util.Streams;
 
-public interface Concurrency extends Thing {
+public interface Concurrency<THIS extends Concurrency<THIS, E>, E extends Thing<E>> extends Thing<THIS> {
 
-	Stream<? extends Thing> threads();
+	Stream<? extends Thing<? extends THIS>> threads();
 
-	static Thing of(final Stream<Thing> threads) {
+	static <THIS extends Concurrency<THIS, E>, E extends Thing<E>>
+	Thing<? extends THIS> of(final Stream<? extends E> threads) {
 		return of(threads.toArray(Thing[]::new));
 	}
 
-	static Thing of(final Thing... threads) {
+	@SafeVarargs
+	static <THIS extends Concurrency<THIS, E>, E extends Thing<E>>
+	Thing<? extends THIS> of(final Thing<? extends E>... threads) {
 		switch (threads.length) {
 		case 0:
 			return Epsilon.INSTANCE;
 		case 1:
 			return threads[0];
 		default:
-			return new Concurrency() {
+			return new Impl<E>() {
+
 				@Override
-				public <T> T accept(final Visitor<T> visitor) {
-					return visitor.handle(this);
-				}
-				@Override
-				public Stream<Thing> threads() {
+				public Stream<? extends E> threads() {
 					return Stream.of(threads);
 				}
+
 			};
 		}
 	}
 
+	static abstract class Impl<E extends Thing<E>> implements Concurrency<Impl<E>, E> {
+
+		@Override
+		public Impl<E> THIS() {
+			return this;
+		}
+
+		@Override
+		public <T> T accept(final Thing.Visitor<T> visitor) {
+			return visitor.handle(this);
+		}
+
+	}
 
 	@Override
 	default Type typeof() {
@@ -41,14 +55,14 @@ public interface Concurrency extends Thing {
 	}
 
 	@Override
-	default Epsilon isEqual(final Thing that) {
-		return that.accept(new Visitor<Epsilon>() {
+	default Epsilon<?> isEqual(final Thing<?> that) {
+		return that.accept(new Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Thing that) {
+			public Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.of("");
 			}
 			@Override
-			public Epsilon handle(final Concurrency that) {
+			public Epsilon<?> handle(final Concurrency<?,?> that) {
 				try {
 					return Epsilon.Conjunction(Streams.zip(threads(), that.threads(), Thing::isEqual));
 				} catch (final Nothing e) {
@@ -65,7 +79,7 @@ public interface Concurrency extends Thing {
 	}
 
 	@Override
-	default Thing evaluate() {
+	default Thing<? extends THIS> evaluate() {
 		return of(threads().map(Thing::evaluate));
 	}
 

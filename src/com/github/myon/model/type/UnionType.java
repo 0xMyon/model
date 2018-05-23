@@ -7,22 +7,22 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.Void;
 
-public interface UnionType extends Type {
+public interface UnionType<THIS extends UnionType<THIS, E>, E extends Type<E>> extends Type<THIS> {
 
-	Stream<? extends Type> superposed();
+	Stream<? extends E> superposed();
 
-	static Type of(final Stream<Type> summants) {
-		return of(summants.map(t -> t.accept(new Type.Visitor<Stream<? extends Type>>() {
+	static <E extends Type<E>> Type<? extends E> of(final Stream<? extends E> summants) {
+		return of(summants.map(t -> t.accept(new Type.Visitor<Stream<? extends Type<? extends E>>>() {
 			@Override
-			public Stream<Type> handle(final Type that) {
+			public Stream<Type<? extends E>> handle(final Type<?> that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<Type> handle(final Void that) {
+			public Stream<Type<? extends E>> handle(final Void<?> that) {
 				return Stream.of();
 			}
 			@Override
-			public Stream<? extends Type> handle(final UnionType that) {
+			public Stream<? extends Type<? extends E>> handle(final UnionType that) {
 				return that.superposed();
 			}
 		})).reduce(Stream.of(), Stream::concat).toArray(Type[]::new));
@@ -59,7 +59,7 @@ public interface UnionType extends Type {
 	}
 
 	@Override
-	default Type evaluate() {
+	default Type<? extends THIS> evaluate() {
 		return of(superposed().map(Type::evaluate));
 	}
 

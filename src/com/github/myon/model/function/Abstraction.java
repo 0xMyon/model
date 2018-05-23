@@ -7,14 +7,14 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.type.FunctionType;
 
-public interface Abstraction<DOMAIN extends Thing, CODOMAIN extends Thing> extends Function<DOMAIN, CODOMAIN> {
+public interface Abstraction<THING extends Abstraction<THING, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THING, DOMAIN, CODOMAIN> {
 
-	Function<? super DOMAIN, ? extends CODOMAIN> implementation();
+	Function<?,? super DOMAIN, ? extends CODOMAIN> implementation();
 
 	static <DOMAIN extends Thing, CODOMAIN extends Thing>
 	Abstraction<? super DOMAIN, ? extends CODOMAIN> of(
 			final Type domain,
-			final Function<? super DOMAIN, ? extends CODOMAIN> implementation) {
+			final Function<?,? super DOMAIN, ? extends CODOMAIN> implementation) {
 		return implementation.typeof().domain().containsAll(domain).accept(new Epsilon.Visitor<Abstraction<? super DOMAIN, ? extends CODOMAIN>>() {
 			@Override
 			public Abstraction<? super DOMAIN, ? extends CODOMAIN> handle(final Nothing that) {

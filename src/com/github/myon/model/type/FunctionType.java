@@ -6,13 +6,14 @@ import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
-public interface FunctionType extends Type {
+public interface FunctionType<THING extends FunctionType<THING>> extends Type<THING> {
 
-	Type domain();
-	default Type codomain() {
+	Type<?> domain();
+
+	default Type<?> codomain() {
 		return codomain(domain());
 	}
-	Type codomain(Type domain);
+	Type<?> codomain(Type<?> domain);
 
 	@Override
 	default Class<? extends Function> c() {
@@ -47,14 +48,14 @@ public interface FunctionType extends Type {
 
 
 	@Override
-	default Function<? extends Thing, ? extends Thing> cast(final Thing thing) {
-		return thing.accept(new Thing.Visitor<Function<? extends Thing, ? extends Thing>>() {
+	default Function<?,? extends Thing, ? extends Thing> cast(final Thing thing) {
+		return thing.accept(new Thing.Visitor<Function<?,? extends Thing, ? extends Thing>>() {
 			@Override
-			public Function<? extends Thing, ? extends Thing> handle(final Function<? extends Thing, ? extends Thing> that) {
+			public Function<?,? extends Thing, ? extends Thing> handle(final Function<?,? extends Thing, ? extends Thing> that) {
 				return contains(that).branch(that);
 			}
 			@Override
-			public Function<? extends Thing, ? extends Thing> handle(final Thing that) {
+			public Function<?,? extends Thing, ? extends Thing> handle(final Thing that) {
 				return Nothing.of("Cast exception");
 			}
 		});

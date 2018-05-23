@@ -6,7 +6,7 @@ import com.github.myon.model.Epsilon;
 import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 
-public interface EmptyFunction<DOMAIN extends Thing> extends Composition<DOMAIN,Nothing,Nothing>, UnionFunction<DOMAIN,Nothing>, Abstraction<DOMAIN,Nothing> {
+public interface EmptyFunction<THING extends EmptyFunction<THING, DOMAIN>, DOMAIN extends Thing<DOMAIN>> extends Composition<THING,DOMAIN,Nothing,Nothing>, UnionFunction<THING,DOMAIN,Nothing>, Abstraction<THING,DOMAIN,Nothing> {
 
 	@Override
 	default boolean isEvaluable() {

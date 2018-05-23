@@ -6,7 +6,7 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.type.FunctionType;
 
-public interface Identity<TYPE extends Thing> extends Function<TYPE, TYPE> {
+public interface Identity<THING extends Identity<THING, TYPE>, TYPE extends Thing<TYPE>> extends Function<THING, TYPE, TYPE> {
 
 
 	@Override
@@ -27,7 +27,7 @@ public interface Identity<TYPE extends Thing> extends Function<TYPE, TYPE> {
 	}
 
 	@Override
-	default Identity<TYPE> evaluate() {
+	default Identity<THING,TYPE> evaluate() {
 		return this;
 	}
 

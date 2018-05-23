@@ -7,14 +7,18 @@ import com.github.myon.model.type.MetaType;
 import com.github.myon.model.type.ProductType;
 import com.github.myon.model.type.UnionType;
 
-public interface Void extends FunctionType, MetaType, ProductType, UnionType {
+public interface Void<THIS extends Void<THIS>> extends FunctionType<THIS>, MetaType<THIS,THIS>, ProductType<THIS>, UnionType<THIS> {
 
 	@Override
 	default Class<? extends Nothing> c() {
 		return Nothing.class;
 	}
 
-	static Void INSTANCE = new Void() {
+	static Void<?> INSTANCE = new Impl() {
+
+	};
+
+	static class Impl implements Void<Impl> {
 		@Override
 		public String toString() {
 			return "{}";
@@ -23,7 +27,7 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 		public <T> T accept(final Visitor<T> visitor) {
 			return visitor.handle(this);
 		}
-	};
+	}
 
 	@Override
 	default Nothing cast(final Thing thing) {
@@ -45,7 +49,7 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 	}
 
 	@Override
-	public default Nothing base() {
+	public default Thing<? extends THIS> base() {
 		return Nothing.of("undefined");
 	}
 
@@ -65,8 +69,8 @@ public interface Void extends FunctionType, MetaType, ProductType, UnionType {
 	}
 
 	@Override
-	default  FunctionType evaluate() {
-		return this;
+	default Thing<? extends THIS> evaluate() {
+		return THIS();
 	}
 
 	@Override

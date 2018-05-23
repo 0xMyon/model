@@ -2,7 +2,7 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-public interface Epsilon extends Product {
+public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING> {
 
 	static final  Epsilon INSTANCE = new Epsilon() {
 		@Override
@@ -53,7 +53,7 @@ public interface Epsilon extends Product {
 
 	interface Visitor<T> extends Nothing.Visitor<T> {
 
-		T handle(Epsilon that);
+		T handle(Epsilon<?> that);
 
 
 		@Override

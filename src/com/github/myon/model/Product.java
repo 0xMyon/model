@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import com.github.myon.model.type.ProductType;
 
-public interface Product extends Thing {
+public interface Product<THIS extends Product<THIS>> extends Thing<THIS> {
 
 
 	static Thing of(final Stream<Thing> factors) {

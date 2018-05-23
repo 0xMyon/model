@@ -6,29 +6,29 @@ import java.util.stream.Stream;
  * Most abstract type
  * @author 0xMyon
  */
-public interface Thing {
+public interface Thing<THIS extends Thing<THIS>> {
 
 	/**
 	 * @return most fitting {@link Type}
 	 */
-	Type typeof();
+	Type<?> typeof();
 
 	/**
 	 * equality
 	 * @param that
 	 * @return
 	 */
-	Epsilon isEqual(final Thing that);
+	Epsilon<?> isEqual(final Thing<?> that);
 
 
-	Thing evaluate();
+	Thing<? extends THIS> evaluate();
+
+	THIS THIS();
 
 
-	default <CODOMAIN extends Thing> Thing apply(
-			final Function<Thing, CODOMAIN> function
-			)
-	{
-		return Application.<Thing,CODOMAIN>of(function, this);
+	default <CODOMAIN extends Thing<CODOMAIN>>
+	Thing<? extends CODOMAIN> apply(final Function<?,? super THIS, ? extends CODOMAIN> function) {
+		return Application.<THIS,CODOMAIN>of(function, THIS());
 	}
 
 	boolean isEvaluable();
@@ -79,39 +79,40 @@ public interface Thing {
 
 	<T> T accept(final Visitor<T> visitor);
 
-	static interface Visitor<T> extends Type.Visitor<T>, Epsilon.Visitor<T>, Function.Visitor<T,Thing,Thing> {
+	static interface Visitor<T> extends Type.Visitor<T>, Epsilon.Visitor<T>, Function.Visitor<T> {
 
-		T handle(final Thing that);
-
-		@Override
-		default T handle(final Type that) {
-			return handle((Thing)that);
-		}
+		T handle(final Thing<?> that);
 
 		@Override
-		default T handle(final Function<? super Thing, ? extends Thing> that)  {
-			return handle((Thing)that);
+		default T handle(final Type<?> that) {
+			return handle((Thing<?>)that);
 		}
 
 		@Override
-		default T handle(final Epsilon that) {
-			return handle((Product)that);
+		default <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
+		T handle(final Function<?,? super DOMAIN,? extends CODOMAIN> that)  {
+			return handle((Thing<?>)that);
 		}
 
-		default T handle(final Product that) {
-			return handle((Thing)that);
+		@Override
+		default T handle(final Epsilon<?> that) {
+			return handle((Product<?>)that);
 		}
 
-		default T handle(final Superposition that) {
-			return handle((Thing)that);
+		default T handle(final Product<?> that) {
+			return handle((Thing<?>)that);
 		}
 
-		default T handle(final Concurrency that) {
-			return handle((Thing)that);
+		default T handle(final Superposition<?> that) {
+			return handle((Thing<?>)that);
+		}
+
+		default T handle(final Concurrency<?,?> that) {
+			return handle((Thing<?>)that);
 		}
 
 		default T handle(final Application<?,?> that)  {
-			return handle((Thing)that);
+			return handle((Thing<?>)that);
 		}
 
 		@Override

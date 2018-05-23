@@ -1,7 +1,7 @@
 package com.github.myon.model;
 
 
-public interface Channel extends Thing {
+public interface Channel {
 
 	Type protocol();
 

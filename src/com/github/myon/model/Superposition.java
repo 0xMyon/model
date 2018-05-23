@@ -4,53 +4,66 @@ import java.util.stream.Stream;
 
 import util.Streams;
 
-public interface Superposition extends Thing {
+public interface Superposition<THIS extends Superposition<THIS,E>, E extends Thing<E>> extends Thing<THIS> {
 
-	Stream<? extends Thing> superposed();
+	Stream<? extends Thing<? extends E>> superposed();
 
-	static Thing of(final Stream<? extends Thing> superposed) {
-		return of(superposed.map(t -> t.accept(new Thing.Visitor<Stream<? extends Thing>>() {
+	static abstract class Impl<E extends Thing<E>> implements Superposition<Impl<E>, E> {
+
+		@Override
+		public Impl<E> THIS() {
+			return this;
+		}
+
+		@Override
+		public <T> T accept(final Thing.Visitor<T> visitor) {
+			return visitor.handle(this);
+		}
+
+		@Override
+		public String toString() {
+			return "{"+superposed().map(Object::toString).reduce((a,b) -> a+","+b).orElse("")+"}";
+		}
+
+	}
+
+	static <THING extends Thing<THING>> Thing<? extends THING> of(final Stream<? extends Thing<? extends THING>> superposed) {
+		return of(superposed.map(t -> t.accept(new Thing.Visitor<Stream<? extends Thing<? extends THING>>>() {
 			@Override
-			public Stream<Thing> handle(final Thing that) {
+			public Stream<Thing<? extends THING>> handle(final Thing<?> that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<Thing> handle(final Nothing that) {
+			public Stream<? extends Thing<? extends THING>> handle(final Nothing that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<? extends Thing> handle(final Superposition that) {
+			public Stream<? extends Thing<? extends THING>> handle(final Superposition that) {
 				return that.superposed();
 			}
 		})).reduce(Stream.of(), Stream::concat).toArray(Thing[]::new));
 	}
 
-	static Thing of(final Thing... summants) {
+	static <E extends Thing<E>> Thing<?> of(final Thing<? extends E>... summants) {
 		switch (summants.length) {
 		case 0:
 			return Nothing.of("empty");
 		case 1:
 			return summants[0];
 		default:
-			return new Superposition() {
+			return new Impl<E>() {
+
 				@Override
-				public <T> T accept(final Visitor<T> visitor) {
-					return visitor.handle(this);
-				}
-				@Override
-				public Stream<Thing> superposed() {
+				public Stream<? extends Thing<? extends E>> superposed() {
 					return Stream.of(summants).distinct().sorted();
 				}
-				@Override
-				public String toString() {
-					return "{"+superposed().map(Object::toString).reduce((a,b) -> a+","+b).orElse("")+"}";
-				}
+
 			};
 		}
 	}
 
 	@Override
-	default  Type typeof() {
+	default Type<?> typeof() {
 		return Type.Union(superposed().map(Thing::typeof));
 	}
 

@@ -12,13 +12,13 @@ import com.github.myon.model.type.FunctionType;
 import com.github.myon.model.type.MetaType;
 import com.github.myon.model.type.ProductType;
 
-public interface SystemFunction<DOMAIN extends Thing, CODOMAIN extends Thing> extends Function<DOMAIN, CODOMAIN> {
+public interface SystemFunction<THING extends SystemFunction<THING,DOMAIN,CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THING,DOMAIN, CODOMAIN> {
 	@Override
 	public default boolean isEvaluable() {
 		return false;
 	}
 	@Override
-	public default SystemFunction<? super DOMAIN, ? extends CODOMAIN> evaluate() {
+	public default SystemFunction<?,? super DOMAIN, ? extends CODOMAIN> evaluate() {
 		return this;
 	}
 
@@ -33,7 +33,7 @@ public interface SystemFunction<DOMAIN extends Thing, CODOMAIN extends Thing> ex
 		return that == TYPEOF ? Epsilon.INSTANCE : Nothing.of("Not equal");
 	}
 
-	SystemFunction<Thing, Type> TYPEOF = new SystemFunction<Thing, Type>() {
+	SystemFunction<?,Thing, Type> TYPEOF = new SystemFunction<Thing, Type>() {
 		@Override
 		public Type evaluate( final Thing parameter) {
 			return parameter.typeof();

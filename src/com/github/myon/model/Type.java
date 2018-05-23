@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 import com.github.myon.model.type.ComplementType;
 import com.github.myon.model.type.ConcurrencyType;
 import com.github.myon.model.type.FunctionType;
-import com.github.myon.model.type.IMetaType;
 import com.github.myon.model.type.MetaType;
 import com.github.myon.model.type.ProductType;
 import com.github.myon.model.type.UnionType;
@@ -15,13 +14,13 @@ import com.github.myon.model.type.UnionType;
  *
  * @author 0xMyon
  */
-public interface Type extends Thing {
+public interface Type<THIS extends Type<THIS>> extends Thing<THIS> {
 
 	public static final Void VOID = Void.INSTANCE;
 
 	public static final Type ANYTHING = VOID.invert();
 
-	public static final MetaType TYPE = ANYTHING.typeof();
+	public static final MetaType<?,?> TYPE = ANYTHING.typeof();
 
 	public static final Type EPSILON = Epsilon.INSTANCE.typeof();
 
@@ -46,45 +45,45 @@ public interface Type extends Thing {
 	Epsilon contains(final Thing thing);
 
 	@Override
-	default IMetaType typeof() {
-		return IMetaType.of(this);
+	default MetaType<?,THIS> typeof() {
+		return MetaType.of(THIS());
 	}
 
 	@Override
-	Type evaluate();
+	Type<? extends THIS> evaluate();
 
 	@Override
-	default Epsilon isEqual(final Thing that) {
-		return that.accept(new Thing.Visitor<Epsilon>() {
+	default Epsilon<?> isEqual(final Thing<?> that) {
+		return that.accept(new Thing.Visitor<Epsilon<?>>() {
 			@Override
-			public  Epsilon handle(final Thing that) {
+			public  Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.of("function not supported");
 			}
 			@Override
-			public  Epsilon handle(final Type that) {
+			public  Epsilon<?> handle(final Type<?> that) {
 				return Epsilon.Conjunction(containsAll(that), that.containsAll(Type.this));
 			}
 		});
 	}
 
-	Epsilon containsAll(final Type type);
+	Epsilon containsAll(final Type<?> type);
 
-	Epsilon intersetcs(final Type type);
+	Epsilon intersetcs(final Type<?> type);
 
 
-	default Type intersect(final Type that) {
+	default Type<?> intersect(final Type that) {
 		return invert().unite(that.invert()).invert();
 	}
 
-	default Type invert() {
+	default Type<?> invert() {
 		return ComplementType.of(this);
 	}
 
-	default Type unite(final Type that) {
+	default Type<?> unite(final Type<?> that) {
 		return UnionType.of(this, that);
 	}
 
-	static Type Union(final Stream<Type> united) {
+	static Type<?> Union(final Stream<Type<?>> united) {
 		return united.reduce(Void.INSTANCE, Type::unite);
 	}
 
@@ -96,36 +95,36 @@ public interface Type extends Thing {
 
 	<T> T accept(final Visitor<T> visitor);
 
-	interface Visitor<T> extends Nothing.Visitor<T> {
+	static interface Visitor<T> extends Nothing.Visitor<T> {
 
-		T handle(final Type that);
+		T handle(final Type<?> that);
 
-		default T handle(final MetaType that) {
-			return handle((Type)that);
+		default T handle(final MetaType<?,?> that) {
+			return handle((Type<?>)that);
 		}
 
-		default T handle(final ComplementType that) {
-			return handle((Type)that);
+		default T handle(final ComplementType<?,?> that) {
+			return handle((Type<?>)that);
 		}
 
-		default T handle(final FunctionType that) {
-			return handle((Type)that);
+		default T handle(final FunctionType<?> that) {
+			return handle((Type<?>)that);
 		}
 
-		default T handle(final Void that) {
-			return handle((Type)that);
+		default T handle(final Void<?> that) {
+			return handle((Type<?>)that);
 		}
 
-		default T handle(final ProductType that) {
-			return handle((Type)that);
+		default T handle(final ProductType<?> that) {
+			return handle((Type<?>)that);
 		}
 
-		default T handle(final UnionType that) {
-			return handle((Type)that);
+		default T handle(final UnionType<?> that) {
+			return handle((Type<?>)that);
 		}
 
 		default T handle(final ConcurrencyType that) {
-			return handle((Type)that);
+			return handle((Type<?>)that);
 		}
 
 		@Override

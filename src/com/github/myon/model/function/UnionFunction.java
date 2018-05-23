@@ -13,16 +13,18 @@ import com.github.myon.model.type.FunctionType;
 import util.Streams;
 
 
-public interface UnionFunction<DOMAIN extends Thing, CODOMAIN extends Thing> extends Function<DOMAIN, CODOMAIN> {
+public interface UnionFunction<THING extends UnionFunction<THING, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THING,DOMAIN, CODOMAIN> {
 
-	Stream<? extends Function<? super DOMAIN, ? extends CODOMAIN>> superposed();
+	Stream<? extends Function<?,? super DOMAIN, ? extends CODOMAIN>> superposed();
 
-	static <DOMAIN extends Thing, CODOMAIN extends Thing> Function<? super DOMAIN, ? extends CODOMAIN> of(final Stream<Function<? super DOMAIN, ? extends CODOMAIN>> summants) {
+	static <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
+	Function<?,? super DOMAIN, ? extends CODOMAIN>
+	of(final Stream<Function<?,? super DOMAIN, ? extends CODOMAIN>> summants) {
 		return of(summants.toArray(Function[]::new));
 	}
 
 	@SafeVarargs
-	static <DOMAIN extends Thing, CODOMAIN extends Thing> Function<? super DOMAIN, ? extends CODOMAIN> of(final  Function<? super DOMAIN, ? extends CODOMAIN>... summants) {
+	static <DOMAIN extends Thing, CODOMAIN extends Thing> Function<?,? super DOMAIN, ? extends CODOMAIN> of(final  Function<? super DOMAIN, ? extends CODOMAIN>... summants) {
 		switch (summants.length) {
 		case 0:
 			throw new Error("return empty function here");

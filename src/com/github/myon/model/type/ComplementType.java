@@ -6,11 +6,11 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.Void;
 
-public interface ComplementType extends Type {
+public interface ComplementType<THIS extends ComplementType<THIS>, COMPLEMENT extends Type<COMPLEMENT>> extends Type<THIS> {
 
-	Type complement();
+	COMPLEMENT complement();
 
-	static Type of(final Type complement) {
+	static <COMPLEMENT extends Type<COMPLEMENT>> Type<?> of(final Type<? extends COMPLEMENT> complement) {
 		return complement.accept(new Visitor<Type>() {
 			@Override
 			public Type handle(final ComplementType that) {

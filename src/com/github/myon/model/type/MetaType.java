@@ -5,12 +5,12 @@ import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
-public interface MetaType<BASE extends Type> extends Type {
+public interface MetaType<THIS extends MetaType<THIS, BASE>, BASE extends Type<BASE>> extends Type<THIS> {
 
-	BASE base();
+	Thing<? extends BASE> base();
 
-	static <BASE extends Type> MetaType<BASE> of(final BASE base) {
-		return new MetaType<BASE>() {
+	static <BASE extends Type<BASE>> MetaType<?, BASE> of(final BASE base) {
+		return new MetaType() {
 			@Override
 			public BASE base() {
 				return base;
@@ -52,7 +52,7 @@ public interface MetaType<BASE extends Type> extends Type {
 	}
 
 	@Override
-	public default Type evaluate() {
+	public default MetaType<? extends THIS, ? extends BASE> evaluate() {
 		return of(base().evaluate());
 	}
 

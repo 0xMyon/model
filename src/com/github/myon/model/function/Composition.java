@@ -7,12 +7,12 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.type.FunctionType;
 
 
-public interface Composition<DOMAIN extends Thing, TYPE extends Thing, CODOMAIN extends Thing> extends Function<DOMAIN, CODOMAIN> {
+public interface Composition<THING extends Composition<THING,DOMAIN,TYPE,CODOMAIN>, DOMAIN extends Thing<DOMAIN>, TYPE extends Thing<TYPE>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THING, DOMAIN, CODOMAIN> {
 
 	//Stream<? extends Function> elements();
 
-	Function<? super DOMAIN, ? extends TYPE> first();
-	Function<? super TYPE, ? extends CODOMAIN> second();
+	Function<?,? super DOMAIN, ? extends TYPE> first();
+	Function<?,? super TYPE, ? extends CODOMAIN> second();
 
 
 	@Override
@@ -71,7 +71,7 @@ public interface Composition<DOMAIN extends Thing, TYPE extends Thing, CODOMAIN 
 
 	@Override
 	public
-	default Function<? super DOMAIN, ? extends CODOMAIN> evaluate() {
+	default Function<?,? super DOMAIN, ? extends CODOMAIN> evaluate() {
 		return of(first().evaluate(), second().evaluate());
 	}
 

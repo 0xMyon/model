@@ -5,14 +5,14 @@ package com.github.myon.model;
  * @author 0xMyon
  *
  */
-public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> extends Thing {
+public interface Application<DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Thing<CODOMAIN> {
 
-	Function<? super DOMAIN, ? extends CODOMAIN> function();
-	DOMAIN parameter();
+	Function<?,? super DOMAIN, ? extends CODOMAIN> function();
+	Thing<? extends DOMAIN> parameter();
 
-	static <DOMAIN extends Thing, CODOMAIN extends Thing>
-	Thing
-	of(final Function<? super DOMAIN, ? extends CODOMAIN> function, final DOMAIN thing) {
+	static <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
+	Thing<? extends CODOMAIN>
+	of(final Function<?,? super DOMAIN, ? extends CODOMAIN> function, final DOMAIN thing) {
 		return new Application<DOMAIN, CODOMAIN>() {
 			@Override
 			public DOMAIN parameter() {
@@ -20,7 +20,7 @@ public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> exten
 			}
 
 			@Override
-			public Function<? super DOMAIN, ? extends CODOMAIN> function() {
+			public Function<?,? super DOMAIN, ? extends CODOMAIN> function() {
 				return function;
 			}
 			@Override
@@ -31,6 +31,11 @@ public interface Application<DOMAIN extends Thing, CODOMAIN extends Thing> exten
 			@Override
 			public <T> T accept(final Visitor<T> visitor) {
 				return visitor.handle(this);
+			}
+
+			@Override
+			public CODOMAIN THIS() {
+				return evaluate();
 			}
 
 

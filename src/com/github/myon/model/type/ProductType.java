@@ -10,7 +10,7 @@ import com.github.myon.model.Type;
 
 import util.Streams;
 
-public interface ProductType extends Type {
+public interface ProductType<THIS extends ProductType<THIS>> extends Type<THIS> {
 
 
 	Stream<? extends Type> factors();
