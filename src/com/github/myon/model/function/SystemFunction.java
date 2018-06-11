@@ -33,7 +33,7 @@ public interface SystemFunction<THING extends SystemFunction<THING,DOMAIN,CODOMA
 		return that == TYPEOF ? Epsilon.INSTANCE : Nothing.of("Not equal");
 	}
 
-	SystemFunction<?,Thing, Type> TYPEOF = new SystemFunction<Thing, Type>() {
+	SystemFunction<?,Thing<?>, Type<?>> TYPEOF = new SystemFunction<Thing, Type>() {
 		@Override
 		public Type evaluate( final Thing parameter) {
 			return parameter.typeof();

@@ -42,7 +42,7 @@ public interface Type<THIS extends Type<THIS>> extends Thing<THIS> {
 	 * @param thing
 	 * @return true, if {@link Thing} is contained by the type
 	 */
-	Epsilon contains(final Thing thing);
+	Epsilon<?> contains(final Thing<?> thing);
 
 	@Override
 	default MetaType<?,THIS> typeof() {
@@ -119,7 +119,7 @@ public interface Type<THIS extends Type<THIS>> extends Thing<THIS> {
 			return handle((Type<?>)that);
 		}
 
-		default T handle(final UnionType<?> that) {
+		default T handle(final UnionType<?,?> that) {
 			return handle((Type<?>)that);
 		}
 

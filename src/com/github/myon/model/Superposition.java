@@ -6,7 +6,7 @@ import util.Streams;
 
 public interface Superposition<THIS extends Superposition<THIS,E>, E extends Thing<E>> extends Thing<THIS> {
 
-	Stream<? extends Thing<? extends E>> superposed();
+	Stream<? extends E> superposed();
 
 	static abstract class Impl<E extends Thing<E>> implements Superposition<Impl<E>, E> {
 
@@ -27,18 +27,18 @@ public interface Superposition<THIS extends Superposition<THIS,E>, E extends Thi
 
 	}
 
-	static <THING extends Thing<THING>> Thing<? extends THING> of(final Stream<? extends Thing<? extends THING>> superposed) {
-		return of(superposed.map(t -> t.accept(new Thing.Visitor<Stream<? extends Thing<? extends THING>>>() {
+	static <E extends Thing<E>> Thing<? extends E> of(final Stream<? extends E> superposed) {
+		return of(superposed.map(t -> t.accept(new Thing.Visitor<Stream<? extends Thing<? extends E>>>() {
 			@Override
-			public Stream<Thing<? extends THING>> handle(final Thing<?> that) {
+			public Stream<Thing<? extends E>> handle(final Thing<?> that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<? extends Thing<? extends THING>> handle(final Nothing that) {
+			public Stream<? extends Thing<? extends E>> handle(final Nothing that) {
 				return Stream.of(that);
 			}
 			@Override
-			public Stream<? extends Thing<? extends THING>> handle(final Superposition that) {
+			public Stream<? extends Thing<? extends E>> handle(final Superposition that) {
 				return that.superposed();
 			}
 		})).reduce(Stream.of(), Stream::concat).toArray(Thing[]::new));
@@ -73,17 +73,18 @@ public interface Superposition<THIS extends Superposition<THIS,E>, E extends Thi
 	}
 
 	@Override
-	default Thing evaluate() {
-		return of(superposed().map(Thing::evaluate));
+	default Superposition<? extends THIS,E> evaluate() {
+		return Superposition.of(superposed().map(Thing::evaluate));
 	}
 
 	@Override
-	default Thing apply(final Function function) {
+	default <CODOMAIN extends Thing<CODOMAIN>>
+	Thing<? extends CODOMAIN> apply(final Function<?,? super THIS, ? extends CODOMAIN> function) {
 		return of(superposed().map(x -> x.apply(function)));
 	}
 
 	@Override
-	default Epsilon isEqual( final Thing that) {
+	default Epsilon<?> isEqual( final Thing<?> that) {
 		return that.accept(new Visitor<Epsilon>() {
 			@Override
 			public Epsilon handle(final Thing that) {

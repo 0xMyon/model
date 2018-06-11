@@ -7,7 +7,7 @@ import com.github.myon.model.type.MetaType;
 import com.github.myon.model.type.ProductType;
 import com.github.myon.model.type.UnionType;
 
-public interface Void<THIS extends Void<THIS>> extends FunctionType<THIS>, MetaType<THIS,THIS>, ProductType<THIS>, UnionType<THIS> {
+public interface Void<THIS extends Void<THIS>> extends FunctionType<THIS>, MetaType<THIS,THIS>, ProductType<THIS>, UnionType<THIS,THIS> {
 
 	@Override
 	default Class<? extends Nothing> c() {

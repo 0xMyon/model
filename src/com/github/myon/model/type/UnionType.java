@@ -14,7 +14,7 @@ public interface UnionType<THIS extends UnionType<THIS, E>, E extends Type<E>> e
 	static <E extends Type<E>> Type<? extends E> of(final Stream<? extends E> summants) {
 		return of(summants.map(t -> t.accept(new Type.Visitor<Stream<? extends Type<? extends E>>>() {
 			@Override
-			public Stream<Type<? extends E>> handle(final Type<?> that) {
+			public Stream<Type<? extends E>> handle(final Type<? extends E> that) {
 				return Stream.of(that);
 			}
 			@Override
@@ -76,7 +76,7 @@ public interface UnionType<THIS extends UnionType<THIS, E>, E extends Type<E>> e
 	}
 
 	@Override
-	default Epsilon contains(final Thing thing) {
+	default Epsilon contains(final Thing<?> thing) {
 		return Epsilon.Disjunction(superposed().map(t -> t.contains(thing)));
 	}
 

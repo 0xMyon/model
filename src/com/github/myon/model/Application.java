@@ -8,14 +8,16 @@ package com.github.myon.model;
 public interface Application<DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Thing<CODOMAIN> {
 
 	Function<?,? super DOMAIN, ? extends CODOMAIN> function();
+
 	Thing<? extends DOMAIN> parameter();
 
 	static <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
 	Thing<? extends CODOMAIN>
-	of(final Function<?,? super DOMAIN, ? extends CODOMAIN> function, final DOMAIN thing) {
+	of(final Function<?, ? super DOMAIN, ? extends CODOMAIN> function, final Thing<? extends DOMAIN> thing) {
 		return new Application<DOMAIN, CODOMAIN>() {
+
 			@Override
-			public DOMAIN parameter() {
+			public Thing<? extends DOMAIN> parameter() {
 				return thing;
 			}
 
@@ -35,7 +37,8 @@ public interface Application<DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thin
 
 			@Override
 			public CODOMAIN THIS() {
-				return evaluate();
+				//TODO add impl
+				return evaluate().THIS();
 			}
 
 
@@ -46,13 +49,13 @@ public interface Application<DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thin
 
 
 	@Override
-	default Epsilon isEqual(final Thing that) {
+	default Epsilon<?> isEqual(final Thing<?> that) {
 		return null;
 	}
 
 
 	@Override
-	default Type typeof() {
+	default Type<?> typeof() {
 		return function().typeof().codomain(parameter().typeof());
 	}
 
@@ -62,11 +65,11 @@ public interface Application<DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thin
 	}
 
 	@Override
-	public default CODOMAIN evaluate() {
+	public default Thing<? extends CODOMAIN> evaluate() {
 		if (function().isEvaluable()) {
-			return of(function().evaluate(), parameter());
+			return Application.<DOMAIN,CODOMAIN>of(function().evaluate(), parameter());
 		} else if (parameter().isEvaluable()) {
-			return of(function(), parameter());
+			return Application.<DOMAIN,CODOMAIN>of(function(), parameter());
 		} else {
 			return function().evaluate(parameter());
 		}

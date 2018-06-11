@@ -10,9 +10,9 @@ import com.github.myon.model.Type;
 
 import util.Streams;
 
-public interface ConcurrencyType extends Type {
+public interface ConcurrencyType<THIS extends ConcurrencyType<THIS>> extends Type<THIS> {
 
-	Stream<? extends Type> threads();
+	Stream<? extends Type> threadsx();
 
 	static Type of(final Stream<Type> threads) {
 		return of(threads.toArray(Type[]::new));
@@ -31,7 +31,7 @@ public interface ConcurrencyType extends Type {
 					return visitor.handle(this);
 				}
 				@Override
-				public Stream<? extends Type> threads() {
+				public Stream<? extends Type> threadsx() {
 					return Stream.of(threads);
 				}
 			};
@@ -103,7 +103,7 @@ public interface ConcurrencyType extends Type {
 	}
 
 	@Override
-	default Epsilon contains(final Thing thing) {
+	default Epsilon contains(final Thing<?> thing) {
 		return thing.accept(new Thing.Visitor<Epsilon>() {
 			@Override
 			public Epsilon handle(final Thing that) {

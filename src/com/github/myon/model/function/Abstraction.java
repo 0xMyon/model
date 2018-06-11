@@ -7,7 +7,7 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.type.FunctionType;
 
-public interface Abstraction<THING extends Abstraction<THING, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THING, DOMAIN, CODOMAIN> {
+public interface Abstraction<THIS extends Abstraction<THIS, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THIS, DOMAIN, CODOMAIN> {
 
 	Function<?,? super DOMAIN, ? extends CODOMAIN> implementation();
 
@@ -65,12 +65,12 @@ public interface Abstraction<THING extends Abstraction<THING, DOMAIN, CODOMAIN>,
 	}
 
 	@Override
-	default Abstraction<? super DOMAIN, ? extends CODOMAIN> evaluate() {
+	default Abstraction<THIS, DOMAIN, CODOMAIN> evaluate() {
 		return of(typeof().domain(), implementation().evaluate());
 	}
 
 	@Override
-	default CODOMAIN evaluate(final DOMAIN parameter) {
+	default CODOMAIN evaluate(final Thing<? extends DOMAIN> parameter) {
 		return implementation().evaluate(parameter);
 	}
 

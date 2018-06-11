@@ -8,7 +8,7 @@ import util.Streams;
 
 public interface Concurrency<THIS extends Concurrency<THIS, E>, E extends Thing<E>> extends Thing<THIS> {
 
-	Stream<? extends Thing<? extends THIS>> threads();
+	Stream<? extends E> threads();
 
 	static <THIS extends Concurrency<THIS, E>, E extends Thing<E>>
 	Thing<? extends THIS> of(final Stream<? extends E> threads) {

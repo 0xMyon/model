@@ -6,7 +6,7 @@ import com.github.myon.model.Epsilon;
 import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 
-public interface EmptyFunction<THING extends EmptyFunction<THING, DOMAIN>, DOMAIN extends Thing<DOMAIN>> extends Composition<THING,DOMAIN,Nothing,Nothing>, UnionFunction<THING,DOMAIN,Nothing>, Abstraction<THING,DOMAIN,Nothing> {
+public interface EmptyFunction<THIS extends EmptyFunction<THIS, DOMAIN>, DOMAIN extends Thing<DOMAIN>> extends Composition<THIS,DOMAIN,Nothing,Nothing>, UnionFunction<THIS,DOMAIN,Nothing>, Abstraction<THIS,DOMAIN,Nothing> {
 
 	@Override
 	default boolean isEvaluable() {
@@ -19,12 +19,12 @@ public interface EmptyFunction<THING extends EmptyFunction<THING, DOMAIN>, DOMAI
 	}
 
 	@Override
-	default EmptyFunction<? super DOMAIN> evaluate() {
+	default EmptyFunction<THIS, DOMAIN> evaluate() {
 		return this;
 	}
 
 	@Override
-	default Nothing evaluate(final DOMAIN parameter) {
+	default Nothing evaluate(final Thing<? extends DOMAIN> parameter) {
 		return Nothing.of("undefined");
 	}
 

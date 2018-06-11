@@ -112,7 +112,7 @@ public interface ProductType<THIS extends ProductType<THIS>> extends Type<THIS> 
 	}
 
 	@Override
-	public default Epsilon contains( final Thing thing) {
+	public default Epsilon contains( final Thing<?> thing) {
 		return thing.accept(new Thing.Visitor<Epsilon>() {
 			@Override
 			public Epsilon handle(final Thing that) {

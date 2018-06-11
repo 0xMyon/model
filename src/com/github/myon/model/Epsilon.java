@@ -2,22 +2,31 @@ package com.github.myon.model;
 
 import java.util.stream.Stream;
 
-public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING> {
+public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING,Nothing> {
 
-	static final  Epsilon INSTANCE = new Epsilon() {
+	interface Implementation extends Epsilon<Implementation> {
+		@Override
+		public default <T> T accept(final Epsilon.Visitor<T> visitor) {
+			return visitor.handle(this);
+		}
+		@Override
+		public default Implementation THIS() {
+			return this;
+		}
+	}
+
+
+
+	static final Epsilon<?> INSTANCE = new Implementation() {
 		@Override
 		public String toString() {
 			return "ɛ";
-		}
-		@Override
-		public <T> T accept(final Epsilon.Visitor<T> visitor) {
-			return visitor.handle(this);
 		}
 	};
 
 	@Override
 
-	default Epsilon isEqual( final Thing that) {
+	default Epsilon<?> isEqual( final Thing that) {
 		return that.accept(new Thing.Visitor<Epsilon>() {
 			@Override
 			public  Epsilon handle(final Thing that) {
@@ -30,13 +39,13 @@ public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING> {
 		});
 	}
 
-	static Epsilon of(final boolean b) {
+	static Epsilon<?> of(final boolean b) {
 		return b ? INSTANCE : Nothing.of("false");
 	}
 
 	@Override
 	public
-	default Stream<? extends Thing> factors() {
+	default Stream<Thing<? extends Nothing>> factors() {
 		return Stream.of();
 	}
 

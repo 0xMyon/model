@@ -1,7 +1,5 @@
 package com.github.myon.model;
 
-import java.util.stream.Stream;
-
 /**
  * Most abstract type
  * @author 0xMyon
@@ -59,6 +57,8 @@ public interface Thing<THIS extends Thing<THIS>> {
 	 * @return
 	 * @see #superpose(Thing)
 	 */
+
+	/*
 	static Thing Superposition(final Stream<Thing> supoersosed) {
 		return supoersosed.reduce(Thing::superpose).orElse(Nothing.of("empty superposition"));
 	}
@@ -68,13 +68,14 @@ public interface Thing<THIS extends Thing<THIS>> {
 	}
 
 
-	default Thing concat(final Thing that) {
+	default Thing<?> concat(final Thing<?> that) {
 		return Product.of(this, that);
 	}
 
 	static Thing Sequence(final Stream<Thing> sequenced) {
 		return sequenced.reduce(Epsilon.INSTANCE, Thing::concat);
 	}
+	 */
 
 
 	<T> T accept(final Visitor<T> visitor);
@@ -96,14 +97,14 @@ public interface Thing<THIS extends Thing<THIS>> {
 
 		@Override
 		default T handle(final Epsilon<?> that) {
-			return handle((Product<?>)that);
+			return handle((Product<?,?>)that);
 		}
 
-		default T handle(final Product<?> that) {
+		default T handle(final Product<?,?> that) {
 			return handle((Thing<?>)that);
 		}
 
-		default T handle(final Superposition<?> that) {
+		default T handle(final Superposition<?,?> that) {
 			return handle((Thing<?>)that);
 		}
 

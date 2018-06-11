@@ -10,7 +10,7 @@ import com.github.myon.model.function.SystemFunction;
 import com.github.myon.model.function.UnionFunction;
 import com.github.myon.model.type.FunctionType;
 
-public interface Function<THIS extends Function<THIS, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Thing<THIS> {
+public interface Function<THIS extends Function<THIS, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Element<THIS> {
 
 	static <TYPE extends Thing<TYPE>>
 	Function<?,? super TYPE, ? extends TYPE> ID() {
@@ -43,10 +43,10 @@ public interface Function<THIS extends Function<THIS, DOMAIN, CODOMAIN>, DOMAIN 
 	}
 
 	@Override
-	FunctionType typeof();
+	FunctionType<?> typeof();
 
 	@Override
-	Function<?,? super DOMAIN, ? extends CODOMAIN> evaluate();
+	Function<THIS, DOMAIN, CODOMAIN> evaluate();
 
 
 	static interface Visitor<T> extends Nothing.Visitor<T> {
@@ -92,6 +92,6 @@ public interface Function<THIS extends Function<THIS, DOMAIN, CODOMAIN>, DOMAIN 
 		return accept(visitor);
 	}
 
-	<T> T accept(final Visitor<T, ? super DOMAIN, ? extends CODOMAIN> visitor);
+	<T> T accept(final Visitor<T> visitor);
 
 }

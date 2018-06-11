@@ -5,7 +5,7 @@ import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
-public interface MetaType<THIS extends MetaType<THIS, BASE>, BASE extends Type<BASE>> extends Type<THIS> {
+public interface MetaType<THIS extends MetaType<THIS, BASE>, BASE extends Type<BASE>> extends ElementType<THIS> {
 
 	Thing<? extends BASE> base();
 

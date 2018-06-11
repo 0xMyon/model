@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import com.github.myon.model.function.EmptyFunction;
 
-public abstract class Nothing extends Exception implements Application<Nothing,Nothing>, EmptyFunction<Nothing,Nothing>, Void<Nothing>, Epsilon<Nothing>, Superposition<Nothing,Nothing>, Concurrency<Nothing,Nothing> {
+public abstract class Nothing extends Exception implements Application<Nothing,Nothing>, EmptyFunction<Nothing,Nothing>, Void<Nothing>, Epsilon<Nothing> {
 
 	private final String what;
 
@@ -192,7 +192,7 @@ public abstract class Nothing extends Exception implements Application<Nothing,N
 	}
 
 	@Override
-	public  Stream<? extends Nothing> factors() {
+	public Stream<Thing<? extends Nothing>> factors() {
 		return Stream.of();
 	}
 

@@ -13,8 +13,9 @@ import com.github.myon.model.type.FunctionType;
 import util.Streams;
 
 
-public interface UnionFunction<THING extends UnionFunction<THING, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THING,DOMAIN, CODOMAIN> {
+public interface UnionFunction<THIS extends UnionFunction<THIS, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THIS,DOMAIN, CODOMAIN> {
 
+	@Override
 	Stream<? extends Function<?,? super DOMAIN, ? extends CODOMAIN>> superposed();
 
 	static <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
@@ -84,12 +85,12 @@ public interface UnionFunction<THING extends UnionFunction<THING, DOMAIN, CODOMA
 	}
 
 	@Override
-	default Function<? super DOMAIN, ? extends CODOMAIN> evaluate() {
+	default UnionFunction<THIS, DOMAIN, CODOMAIN> evaluate() {
 		return of(superposed().map(Function::evaluate));
 	}
 
 	@Override
-	default CODOMAIN evaluate( final DOMAIN parameter) {
+	default CODOMAIN evaluate( final Thing<? extends DOMAIN> parameter) {
 		return (CODOMAIN) Superposition.of(superposed().map(f -> f.evaluate(parameter)));
 	}
 

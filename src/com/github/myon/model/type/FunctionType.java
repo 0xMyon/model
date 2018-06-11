@@ -6,7 +6,7 @@ import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
-public interface FunctionType<THING extends FunctionType<THING>> extends Type<THING> {
+public interface FunctionType<THING extends FunctionType<THING>> extends ElementType<THING> {
 
 	Type<?> domain();
 

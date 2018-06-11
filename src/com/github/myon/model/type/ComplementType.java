@@ -6,7 +6,7 @@ import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 import com.github.myon.model.Void;
 
-public interface ComplementType<THIS extends ComplementType<THIS>, COMPLEMENT extends Type<COMPLEMENT>> extends Type<THIS> {
+public interface ComplementType<THIS extends ComplementType<THIS, COMPLEMENT>, COMPLEMENT extends Type<COMPLEMENT>> extends ElementType<THIS> {
 
 	COMPLEMENT complement();
 
