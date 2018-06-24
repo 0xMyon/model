@@ -4,20 +4,24 @@ import java.util.stream.Stream;
 
 public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING,Nothing> {
 
-	interface Implementation extends Epsilon<Implementation> {
+	interface Impl extends Epsilon<Impl> {
 		@Override
 		public default <T> T accept(final Epsilon.Visitor<T> visitor) {
 			return visitor.handle(this);
 		}
 		@Override
-		public default Implementation THIS() {
+		public default Impl THIS() {
+			return this;
+		}
+		@Override
+		public default Impl evaluate() {
 			return this;
 		}
 	}
 
 
 
-	static final Epsilon<?> INSTANCE = new Implementation() {
+	static final Epsilon<?> INSTANCE = new Impl() {
 		@Override
 		public String toString() {
 			return "ɛ";
@@ -26,14 +30,14 @@ public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING,Not
 
 	@Override
 
-	default Epsilon<?> isEqual( final Thing that) {
-		return that.accept(new Thing.Visitor<Epsilon>() {
+	default Epsilon<?> isEqual( final Thing<?> that) {
+		return that.accept(new Thing.Visitor<Epsilon<?>>() {
 			@Override
-			public  Epsilon handle(final Thing that) {
+			public  Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public  Epsilon handle(final Epsilon that) {
+			public  Epsilon<?> handle(final Epsilon<?> that) {
 				return that;
 			}
 		});
@@ -49,7 +53,7 @@ public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING,Not
 		return Stream.of();
 	}
 
-	public default Epsilon invert(final String msg) {
+	public default Epsilon<?> invert(final String msg) {
 		return Nothing.of(msg);
 	}
 
@@ -79,10 +83,10 @@ public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING,Not
 	 * @param that
 	 * @return
 	 */
-	default Epsilon conjoin(final Epsilon that) {
-		return that.accept(new Visitor<Epsilon>(){
+	default Epsilon<?> conjoin(final Epsilon<?> that) {
+		return that.accept(new Visitor<Epsilon<?>>(){
 			@Override
-			public  Epsilon handle(final Epsilon that) {
+			public Epsilon<?> handle(final Epsilon<?> that) {
 				return Epsilon.this;
 			}
 		});
@@ -93,37 +97,37 @@ public interface Epsilon<THING extends Epsilon<THING>> extends Product<THING,Not
 	 * @param that
 	 * @return
 	 */
-	default Epsilon disjoin(final Epsilon that) {
+	default Epsilon<?> disjoin(final Epsilon<?> that) {
 		return this;
 	}
 
 
-	static Epsilon Conjunction(final Epsilon... values) {
+	static Epsilon<?> Conjunction(final Epsilon<?>... values) {
 		return Conjunction(Stream.of(values));
 	}
 
 
-	static Epsilon Conjunction(final Stream<Epsilon> values) {
+	static Epsilon<?> Conjunction(final Stream<Epsilon<?>> values) {
 		return values.reduce(Epsilon.INSTANCE, Epsilon::conjoin);
 	}
 
-	static Epsilon Disjunction(final Epsilon... values) {
+	static Epsilon<?> Disjunction(final Epsilon<?>... values) {
 		return Disjunction(Stream.of(values));
 	}
 
-	static Epsilon Disjunction(final Stream<Epsilon> values) {
+	static Epsilon<?> Disjunction(final Stream<Epsilon<?>> values) {
 		return values.reduce(Nothing.of("disjoined"), Epsilon::disjoin);
 	}
 
 	@SuppressWarnings("unchecked")
-	default <T extends Thing> T branch(final T pos) {
+	default <T extends Thing<T>> Thing<? extends T> branch(final Thing<? extends T> pos) {
 		return branch(pos, (T) Nothing.of(""));
 	}
 
 	default <T> T branch(final T pos, final T neg) {
 		return accept(new Visitor<T>() {
 			@Override
-			public T handle(final Epsilon that) {
+			public T handle(final Epsilon<?> that) {
 				return pos;
 			}
 			@Override

@@ -16,17 +16,17 @@ import com.github.myon.model.type.UnionType;
  */
 public interface Type<THIS extends Type<THIS>> extends Thing<THIS> {
 
-	public static final Void VOID = Void.INSTANCE;
+	public static final Void<?> VOID = Void.INSTANCE;
 
-	public static final Type ANYTHING = VOID.invert();
+	public static final Type<?> ANYTHING = VOID.invert();
 
 	public static final MetaType<?,?> TYPE = ANYTHING.typeof();
 
-	public static final Type EPSILON = Epsilon.INSTANCE.typeof();
+	public static final Type<?> EPSILON = Epsilon.INSTANCE.typeof();
 
-	public static FunctionType FUNCTION = FunctionType.of(ANYTHING, Function.identity());
+	public static FunctionType<?> FUNCTION = FunctionType.of(ANYTHING, Function.identity());
 
-	default Thing cast(final Thing thing) {
+	default <T extends Thing<T>> Thing<? extends T> cast(final Thing<? extends T> thing) {
 		return contains(thing).branch(thing);
 	}
 
@@ -66,12 +66,12 @@ public interface Type<THIS extends Type<THIS>> extends Thing<THIS> {
 		});
 	}
 
-	Epsilon containsAll(final Type<?> type);
+	Epsilon<?> containsAll(final Type<?> type);
 
-	Epsilon intersetcs(final Type<?> type);
+	Epsilon<?> intersetcs(final Type<?> type);
 
 
-	default Type<?> intersect(final Type that) {
+	default Type<?> intersect(final Type<?> that) {
 		return invert().unite(that.invert()).invert();
 	}
 
@@ -123,7 +123,7 @@ public interface Type<THIS extends Type<THIS>> extends Thing<THIS> {
 			return handle((Type<?>)that);
 		}
 
-		default T handle(final ConcurrencyType that) {
+		default T handle(final ConcurrencyType<?> that) {
 			return handle((Type<?>)that);
 		}
 

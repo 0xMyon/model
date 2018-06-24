@@ -73,7 +73,7 @@ public interface Superposition<THIS extends Superposition<THIS,E>, E extends Thi
 	}
 
 	@Override
-	default Superposition<? extends THIS,E> evaluate() {
+	default Superposition<? extends THIS, ? extends E> evaluate() {
 		return Superposition.of(superposed().map(Thing::evaluate));
 	}
 

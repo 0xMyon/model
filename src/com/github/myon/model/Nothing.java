@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import com.github.myon.model.function.EmptyFunction;
 
-public abstract class Nothing extends Exception implements Application<Nothing,Nothing>, EmptyFunction<Nothing,Nothing>, Void<Nothing>, Epsilon<Nothing> {
+public abstract class Nothing extends Exception implements Application<Nothing,Nothing>, EmptyFunction<Nothing,Nothing>, Void<Nothing>, Epsilon<Nothing>, Thing<Nothing> {
 
 	private final String what;
 

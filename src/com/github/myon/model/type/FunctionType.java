@@ -6,7 +6,7 @@ import com.github.myon.model.Nothing;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
-public interface FunctionType<THING extends FunctionType<THING>> extends ElementType<THING> {
+public interface FunctionType<THIS extends FunctionType<THIS>> extends ElementType<THIS> {
 
 	Type<?> domain();
 
@@ -20,8 +20,12 @@ public interface FunctionType<THING extends FunctionType<THING>> extends Element
 		return Function.class;
 	}
 
+	interface I extends FunctionType<I> {
+
+	}
+
 	static <T extends Type> FunctionType of(final T domain, final java.util.function.Function<T, Type> codomain) {
-		return new FunctionType() {
+		return new I() {
 			@Override
 			public T domain() {
 				return domain;
@@ -68,42 +72,43 @@ public interface FunctionType<THING extends FunctionType<THING>> extends Element
 	}
 
 	@Override
-	public default FunctionType evaluate() {
+	public default FunctionType<? extends THIS> evaluate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public default Epsilon contains( final Thing thing) {
-		return thing.accept(new Thing.Visitor<Epsilon>() {
+	public default Epsilon<?> contains( final Thing<?> thing) {
+		return thing.accept(new Thing.Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Nothing that) {
+			public Epsilon<?> handle(final Nothing that) {
 				return Epsilon.INSTANCE;
 			}
 			@Override
-			public Epsilon handle(final Thing that) {
+			public Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.of(that.toString()+" is no instance of "+FunctionType.this.toString());
 			}
 			@Override
-			public Epsilon handle(final Function that) {
+			public <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
+			Epsilon<?> handle(final Function<?,? super DOMAIN, ? extends CODOMAIN> that) {
 				return containsAll(that.typeof());
 			}
 		});
 	}
 
 	@Override
-	public default Epsilon containsAll(final Type type) {
-		return type.accept(new Type.Visitor<Epsilon>() {
+	public default Epsilon<?> containsAll(final Type<?> type) {
+		return type.accept(new Type.Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Nothing that) {
+			public Epsilon<?> handle(final Nothing that) {
 				return Nothing.of("Not a type");
 			}
 			@Override
-			public Epsilon handle(final Type that) {
+			public Epsilon<?> handle(final Type<?> that) {
 				return Nothing.of("Not a function type");
 			}
 			@Override
-			public Epsilon handle(final FunctionType that) {
+			public Epsilon<?> handle(final FunctionType<?> that) {
 				return Epsilon.Conjunction(
 						domain().containsAll(that.domain()),
 						codomain().containsAll(that.codomain())
@@ -113,18 +118,18 @@ public interface FunctionType<THING extends FunctionType<THING>> extends Element
 	}
 
 	@Override
-	public default Epsilon intersetcs(final Type type) {
-		return type.accept(new Type.Visitor<Epsilon>() {
+	public default Epsilon<?> intersetcs(final Type<?> type) {
+		return type.accept(new Type.Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Nothing that) {
+			public Epsilon<?> handle(final Nothing that) {
 				return Epsilon.INSTANCE;
 			}
 			@Override
-			public Epsilon handle(final Type that) {
+			public Epsilon<?> handle(final Type<?> that) {
 				return Nothing.of(that.toString()+" doeas not intersects "+FunctionType.this.toString());
 			}
 			@Override
-			public Epsilon handle(final FunctionType that) {
+			public Epsilon<?> handle(final FunctionType<?> that) {
 				return Epsilon.Conjunction(
 						domain().intersetcs(that.domain()),
 						codomain().intersetcs(that.codomain())

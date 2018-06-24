@@ -12,30 +12,38 @@ import com.github.myon.model.type.FunctionType;
 import com.github.myon.model.type.MetaType;
 import com.github.myon.model.type.ProductType;
 
-public interface SystemFunction<THING extends SystemFunction<THING,DOMAIN,CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THING,DOMAIN, CODOMAIN> {
+public interface SystemFunction<THIS extends SystemFunction<THIS,DOMAIN,CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THIS,DOMAIN, CODOMAIN> {
+
 	@Override
-	public default boolean isEvaluable() {
+	default boolean isEvaluable() {
 		return false;
-	}
-	@Override
-	public default SystemFunction<?,? super DOMAIN, ? extends CODOMAIN> evaluate() {
-		return this;
 	}
 
 	@Override
-	public default <T> T accept(final Visitor<T> visitor) {
+	default SystemFunction<? extends THIS,? super DOMAIN, ? extends CODOMAIN> evaluate() {
+		return this;
+	}
+
+	interface I<DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends SystemFunction<I<DOMAIN,CODOMAIN>, DOMAIN, CODOMAIN> {
+		@Override
+		default I<DOMAIN,CODOMAIN> THIS() {
+			return this;
+		}
+	}
+
+	@Override
+	default <T> T accept(final Visitor<T> visitor) {
 		return visitor.handle(this);
 	}
 
 	@Override
-	public
-	default Epsilon isEqual( final Thing that) {
+	default Epsilon<?> isEqual( final Thing<?> that) {
 		return that == TYPEOF ? Epsilon.INSTANCE : Nothing.of("Not equal");
 	}
 
-	SystemFunction<?,Thing<?>, Type<?>> TYPEOF = new SystemFunction<Thing, Type>() {
+	I<Thing<?>, Type<?>> TYPEOF = new I<Thing<?>, Type<?>>() {
 		@Override
-		public Type evaluate( final Thing parameter) {
+		public Type<?> evaluate( final Thing<?> parameter) {
 			return parameter.typeof();
 		}
 		@Override
@@ -43,7 +51,7 @@ public interface SystemFunction<THING extends SystemFunction<THING,DOMAIN,CODOMA
 			return "typeof";
 		}
 		@Override
-		public FunctionType typeof() {
+		public FunctionType<?> typeof() {
 			return FunctionType.of(Type.ANYTHING, MetaType::of);
 		}
 

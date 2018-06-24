@@ -12,7 +12,11 @@ import util.Streams;
 
 public interface ConcurrencyType<THIS extends ConcurrencyType<THIS>> extends Type<THIS> {
 
-	Stream<? extends Type> threadsx();
+	Stream<? extends Type> threads();
+
+	interface I extends ConcurrencyType<I> {
+
+	}
 
 	static Type of(final Stream<Type> threads) {
 		return of(threads.toArray(Type[]::new));
@@ -67,16 +71,16 @@ public interface ConcurrencyType<THIS extends ConcurrencyType<THIS>> extends Typ
 	}
 
 	@Override
-	default Epsilon intersetcs(final Type type) {
-		return type.accept(new Visitor<Epsilon>() {
+	default Epsilon<?> intersetcs(final Type<?> type) {
+		return type.accept(new Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Type that) {
+			public Epsilon<?> handle(final Type<?> that) {
 				return Nothing.of("incompatible");
 			}
 			@Override
-			public Epsilon handle(final ConcurrencyType that) {
+			public Epsilon<?> handle(final ConcurrencyType<?> that) {
 				try {
-					return Epsilon.Conjunction(Streams.zip(threads(), that.threads(), Type::intersetcs));
+					return Epsilon.Conjunction(Streams.zip(threads(), that.threads(), Type<?>::intersetcs));
 				} catch (final Nothing e) {
 					return e;
 				}
@@ -85,16 +89,16 @@ public interface ConcurrencyType<THIS extends ConcurrencyType<THIS>> extends Typ
 	}
 
 	@Override
-	default Epsilon containsAll(final Type type) {
-		return type.accept(new Visitor<Epsilon>() {
+	default Epsilon<?> containsAll(final Type<?> type) {
+		return type.accept(new Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Type that) {
+			public Epsilon<?> handle(final Type<?> that) {
 				return Nothing.of("incompatible");
 			}
 			@Override
-			public Epsilon handle(final ConcurrencyType that) {
+			public Epsilon<?> handle(final ConcurrencyType<?> that) {
 				try {
-					return Epsilon.Conjunction(Streams.zip(threads(), that.threads(), Type::containsAll));
+					return Epsilon.Conjunction(Streams.zip(threads(), that.threads(), Type<?>::containsAll));
 				} catch (final Nothing e) {
 					return e;
 				}
@@ -103,16 +107,16 @@ public interface ConcurrencyType<THIS extends ConcurrencyType<THIS>> extends Typ
 	}
 
 	@Override
-	default Epsilon contains(final Thing<?> thing) {
-		return thing.accept(new Thing.Visitor<Epsilon>() {
+	default Epsilon<?> contains(final Thing<?> thing) {
+		return thing.accept(new Thing.Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Thing that) {
+			public Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.of("no object of");
 			}
 			@Override
-			public Epsilon handle(final Concurrency that) {
+			public Epsilon<?> handle(final Concurrency<?,?> that) {
 				try {
-					return Epsilon.Conjunction(Streams.zip(threads(), that.threads(), Type::contains));
+					return Epsilon.Conjunction(Streams.zip(threads(), that.threads(), Type<?>::contains));
 				} catch (final Nothing e) {
 					return e;
 				}

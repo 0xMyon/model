@@ -21,7 +21,7 @@ public interface Identity<THIS extends Identity<THIS, TYPE>, TYPE extends Thing<
 
 
 	@Override
-	default Epsilon isEqual(final Thing that) {
+	default Epsilon<?> isEqual(final Thing<?> that) {
 		// TODO Auto-generated method stub
 		return null;
 	}

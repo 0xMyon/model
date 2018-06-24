@@ -14,23 +14,32 @@ public interface Void<THIS extends Void<THIS>> extends FunctionType<THIS>, MetaT
 		return Nothing.class;
 	}
 
+
 	static Void<?> INSTANCE = new Impl() {
-
-	};
-
-	static class Impl implements Void<Impl> {
 		@Override
 		public String toString() {
 			return "{}";
 		}
+
+
+	};
+
+	interface Impl extends Void<Impl> {
+
 		@Override
-		public <T> T accept(final Visitor<T> visitor) {
+		public default <T> T accept(final Visitor<T> visitor) {
 			return visitor.handle(this);
 		}
+
+		@Override
+		public default Impl THIS() {
+			return this;
+		}
+
 	}
 
 	@Override
-	default Nothing cast(final Thing thing) {
+	default Nothing cast(final Thing<?> thing) {
 		return thing.accept(new Thing.Visitor<Nothing>() {
 			@Override
 			public Nothing handle(final Thing that) {
@@ -44,22 +53,22 @@ public interface Void<THIS extends Void<THIS>> extends FunctionType<THIS>, MetaT
 	}
 
 	@Override
-	public default Stream<? extends Type> factors() {
+	public default Stream<? extends Type<?>> factors() {
 		return Stream.of();
 	}
 
 	@Override
-	public default Thing<? extends THIS> base() {
+	public default Void<? extends THIS> base() {
+		return Void.of("undefined");
+	}
+
+	@Override
+	public default Type<?> codomain(final Type domain) {
 		return Nothing.of("undefined");
 	}
 
 	@Override
-	public default Type codomain(final Type domain) {
-		return Nothing.of("undefined");
-	}
-
-	@Override
-	public default Type domain() {
+	public default Type<?> domain() {
 		return Nothing.of("undefined");
 	}
 
@@ -69,49 +78,55 @@ public interface Void<THIS extends Void<THIS>> extends FunctionType<THIS>, MetaT
 	}
 
 	@Override
-	default Thing<? extends THIS> evaluate() {
+	default Void<? extends THIS> evaluate() {
 		return THIS();
 	}
 
 	@Override
-	default  Epsilon contains( final Thing thing) {
-		return thing.accept(new Thing.Visitor<Epsilon>() {
+	public default Epsilon<?> isEqual(final Thing<?> that) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	default  Epsilon<?> contains(final Thing<?> thing) {
+		return thing.accept(new Thing.Visitor<Epsilon<?>>() {
 			@Override
-			public  Epsilon handle(final  Thing that) {
+			public Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.TypeMiss(Void.this, that);
 			}
 			@Override
-			public  Epsilon handle(final  Nothing that) {
+			public Epsilon<?> handle(final Nothing that) {
 				return Epsilon.INSTANCE;
 			}
 		});
 	}
 
 	@Override
-	public default  Epsilon containsAll(final  Type type) {
-		return type.accept(new Type.Visitor<Epsilon>(){
+	public default Epsilon<?> containsAll(final Type<?> type) {
+		return type.accept(new Type.Visitor<Epsilon<?>>(){
 			@Override
-			public  Epsilon handle(final  Type that) {
+			public Epsilon<?> handle(final Type<?> that) {
 				return Nothing.of(that.toString()+" is not empty");
 			}
 			@Override
-			public  Epsilon handle(final  Void that) {
+			public Epsilon<?> handle(final Void<?> that) {
 				return Epsilon.INSTANCE;
 			}
 			@Override
-			public  Epsilon handle(final  Nothing that) {
+			public Epsilon<?> handle(final Nothing that) {
 				return Nothing.of(that.toString()+" is not a type");
 			}
 		});
 	}
 
 	@Override
-	public default Epsilon intersetcs(final  Type type) {
+	public default Epsilon<?> intersetcs(final Type<?> type) {
 		return Nothing.of("no intersection");
 	}
 
 	@Override
-	default Stream<? extends Type> superposed() {
+	default Stream<? extends THIS> superposed() {
 		return Stream.of();
 	}
 

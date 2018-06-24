@@ -11,6 +11,13 @@ public interface UnionType<THIS extends UnionType<THIS, E>, E extends Type<E>> e
 
 	Stream<? extends E> superposed();
 
+	interface I<E extends Type<E>> extends UnionType<I<E>, E> {
+		@Override
+		default I<E> evaluate() {
+			return of(superposed().map(Type::evaluate));
+		}
+	}
+
 	static <E extends Type<E>> Type<? extends E> of(final Stream<? extends E> summants) {
 		return of(summants.map(t -> t.accept(new Type.Visitor<Stream<? extends Type<? extends E>>>() {
 			@Override
@@ -59,24 +66,22 @@ public interface UnionType<THIS extends UnionType<THIS, E>, E extends Type<E>> e
 	}
 
 	@Override
-	default Type<? extends THIS> evaluate() {
-		return of(superposed().map(Type::evaluate));
-	}
+	Type<? extends THIS> evaluate();
 
 	@Override
-	default Epsilon intersetcs(final Type type) {
+	default Epsilon<?> intersetcs(final Type<?> type) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	default Epsilon containsAll(final Type type) {
+	default Epsilon<?> containsAll(final Type<?> type) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	default Epsilon contains(final Thing<?> thing) {
+	default Epsilon<?> contains(final Thing<?> thing) {
 		return Epsilon.Disjunction(superposed().map(t -> t.contains(thing)));
 	}
 

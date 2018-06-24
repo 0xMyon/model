@@ -1,12 +1,14 @@
 package com.github.myon.model;
 
-public interface Element<THIS extends Element<THIS>> extends Superposition<THIS, THIS>, Product<THIS, THIS>, Concurrency<THIS, THIS> {
+import com.github.myon.model.type.ElementType;
+
+public interface Element<THIS extends Element<THIS>> extends Thing<THIS> {
 
 	@Override
 	boolean isEvaluable();
 
 	@Override
-	Type typeof();
+	ElementType<?> typeof();
 
 	@Override
 	Epsilon<?> isEqual(Thing<?> that);

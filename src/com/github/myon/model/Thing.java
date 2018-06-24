@@ -32,7 +32,7 @@ public interface Thing<THIS extends Thing<THIS>> {
 	boolean isEvaluable();
 
 	default void printEval() {
-		Thing thing = this;
+		Thing<?> thing = this;
 		System.out.println(thing.toString());
 		int i = 0;
 		while(thing.isEvaluable() && (i++ < 100)) {

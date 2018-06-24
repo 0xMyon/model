@@ -22,16 +22,16 @@ public interface Function<THIS extends Function<THIS, DOMAIN, CODOMAIN>, DOMAIN 
 	 * @param parameter
 	 * @return
 	 */
-	CODOMAIN evaluate(final Thing<? extends DOMAIN> parameter);
+	Thing<? extends CODOMAIN> evaluate(final Thing<? extends DOMAIN> parameter);
 
 
 	default <COCODOMAIN extends Thing<COCODOMAIN>>
 	Function<?,? super DOMAIN, ? extends COCODOMAIN>
 	compose(final Function<?,? super CODOMAIN, ? extends COCODOMAIN> that) {
-		return Composition.of(this.evaluate(), that);
+		return Composition.<DOMAIN,CODOMAIN,COCODOMAIN>of(THIS(), that);
 	}
 
-	static Function Composition(final Stream<Function> composed) {
+	static Function<?,?,?> Composition(final Stream<Function<?,?,?>> composed) {
 		return composed.reduce(Function::compose).orElse(Function.ID());
 	}
 
@@ -46,7 +46,7 @@ public interface Function<THIS extends Function<THIS, DOMAIN, CODOMAIN>, DOMAIN 
 	FunctionType<?> typeof();
 
 	@Override
-	Function<THIS, DOMAIN, CODOMAIN> evaluate();
+	Function<? extends THIS, ? super DOMAIN, ? extends CODOMAIN> evaluate();
 
 
 	static interface Visitor<T> extends Nothing.Visitor<T> {

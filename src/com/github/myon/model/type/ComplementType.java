@@ -8,7 +8,14 @@ import com.github.myon.model.Void;
 
 public interface ComplementType<THIS extends ComplementType<THIS, COMPLEMENT>, COMPLEMENT extends Type<COMPLEMENT>> extends ElementType<THIS> {
 
-	COMPLEMENT complement();
+	Type<? extends COMPLEMENT> complement();
+
+	interface I<COMPLEMENT extends Type<COMPLEMENT>> extends ComplementType<I<COMPLEMENT>, COMPLEMENT> {
+		@Override
+		public default I<COMPLEMENT> evaluate() {
+			return of(complement().evaluate());
+		}
+	}
 
 	static <COMPLEMENT extends Type<COMPLEMENT>> Type<?> of(final Type<? extends COMPLEMENT> complement) {
 		return complement.accept(new Visitor<Type>() {
@@ -18,9 +25,9 @@ public interface ComplementType<THIS extends ComplementType<THIS, COMPLEMENT>, C
 			}
 			@Override
 			public Type handle(final Type that) {
-				return new ComplementType() {
+				return new I<COMPLEMENT>() {
 					@Override
-					public Type complement() {
+					public Type<? extends COMPLEMENT> complement() {
 						return that;
 					}
 					@Override
@@ -41,13 +48,10 @@ public interface ComplementType<THIS extends ComplementType<THIS, COMPLEMENT>, C
 		return complement().isEvaluable();
 	}
 
-	@Override
-	public default Type evaluate() {
-		return of(complement().evaluate());
-	}
+
 
 	@Override
-	public default Epsilon contains(final Thing thing) {
+	public default Epsilon<?> contains(final Thing<?> thing) {
 		return thing.accept(new Thing.Visitor<Epsilon>() {
 			@Override
 			public Epsilon handle(final Nothing that) {
@@ -61,7 +65,7 @@ public interface ComplementType<THIS extends ComplementType<THIS, COMPLEMENT>, C
 	}
 
 	@Override
-	public default Epsilon containsAll(final Type type) {
+	public default Epsilon<?> containsAll(final Type<?> type) {
 		return type.accept(new Type.Visitor<Epsilon>() {
 			@Override
 			public  Epsilon handle(final Nothing that) {
@@ -79,7 +83,7 @@ public interface ComplementType<THIS extends ComplementType<THIS, COMPLEMENT>, C
 	}
 
 	@Override
-	public default Epsilon intersetcs(final Type type) {
+	public default Epsilon<?> intersetcs(final Type<?> type) {
 		return type.accept(new Type.Visitor<Epsilon>() {
 			@Override
 			public Epsilon handle(final Nothing that) {

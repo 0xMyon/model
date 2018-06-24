@@ -15,8 +15,23 @@ import util.Streams;
 
 public interface UnionFunction<THIS extends UnionFunction<THIS, DOMAIN, CODOMAIN>, DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THIS,DOMAIN, CODOMAIN> {
 
-	@Override
 	Stream<? extends Function<?,? super DOMAIN, ? extends CODOMAIN>> superposed();
+
+
+	interface I<DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>> extends UnionFunction<I<DOMAIN,CODOMAIN>, DOMAIN, CODOMAIN> {
+
+		@Override
+		default I<DOMAIN,CODOMAIN> THIS() {
+			return this;
+		}
+
+		@Override
+		default I<DOMAIN,CODOMAIN> evaluate() {
+			return of(superposed().map(Function::evaluate));
+		}
+
+	}
+
 
 	static <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
 	Function<?,? super DOMAIN, ? extends CODOMAIN>
@@ -24,17 +39,20 @@ public interface UnionFunction<THIS extends UnionFunction<THIS, DOMAIN, CODOMAIN
 		return of(summants.toArray(Function[]::new));
 	}
 
+
+
 	@SafeVarargs
-	static <DOMAIN extends Thing, CODOMAIN extends Thing> Function<?,? super DOMAIN, ? extends CODOMAIN> of(final  Function<? super DOMAIN, ? extends CODOMAIN>... summants) {
+	static <DOMAIN extends Thing<DOMAIN>, CODOMAIN extends Thing<CODOMAIN>>
+	Function<?,? super DOMAIN, ? extends CODOMAIN> of(final  Function<?,? super DOMAIN, ? extends CODOMAIN>... summants) {
 		switch (summants.length) {
 		case 0:
 			throw new Error("return empty function here");
 		case 1:
 			return summants[0];
 		default:
-			return new UnionFunction<DOMAIN, CODOMAIN>() {
+			return new I<DOMAIN, CODOMAIN>() {
 				@Override
-				public  Stream<Function<? super DOMAIN, ? extends CODOMAIN>> superposed() {
+				public  Stream<Function<?,? super DOMAIN, ? extends CODOMAIN>> superposed() {
 					//TODO sort & eliminate doubles & reduce nested Unions
 					return Stream.of(summants).distinct();
 				}
@@ -67,14 +85,14 @@ public interface UnionFunction<THIS extends UnionFunction<THIS, DOMAIN, CODOMAIN
 	}
 
 	@Override
-	default Epsilon isEqual( final Thing that) {
-		return that.accept(new Thing.Visitor<Epsilon>(){
+	default Epsilon<?> isEqual( final Thing<?> that) {
+		return that.accept(new Thing.Visitor<Epsilon<?>>(){
 			@Override
-			public  Epsilon handle(final Thing that) {
+			public  Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.of("not equal");
 			}
 			@Override
-			public Epsilon handle(final UnionFunction<?,?> that) {
+			public Epsilon<?> handle(final UnionFunction<?,?,?> that) {
 				try {
 					return Epsilon.Conjunction(Streams.zip(superposed(), that.superposed(), Function::isEqual));
 				} catch (final Nothing e) {
@@ -84,14 +102,11 @@ public interface UnionFunction<THIS extends UnionFunction<THIS, DOMAIN, CODOMAIN
 		});
 	}
 
-	@Override
-	default UnionFunction<THIS, DOMAIN, CODOMAIN> evaluate() {
-		return of(superposed().map(Function::evaluate));
-	}
+
 
 	@Override
-	default CODOMAIN evaluate( final Thing<? extends DOMAIN> parameter) {
-		return (CODOMAIN) Superposition.of(superposed().map(f -> f.evaluate(parameter)));
+	default Thing<? extends CODOMAIN> evaluate(final Thing<? extends DOMAIN> parameter) {
+		return Superposition.of(superposed().map(f -> f.evaluate(parameter)));
 	}
 
 }

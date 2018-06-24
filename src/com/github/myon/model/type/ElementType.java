@@ -1,23 +1,22 @@
 package com.github.myon.model.type;
 
-import com.github.myon.model.Element;
 import com.github.myon.model.Epsilon;
 import com.github.myon.model.Thing;
 import com.github.myon.model.Type;
 
-public interface ElementType<THIS extends ElementType<THIS>> extends Element<THIS>, ConcurrencyType<THIS>, ProductType<THIS>, UnionType<THIS, THIS>  {
+public interface ElementType<THIS extends ElementType<THIS>> extends Type<THIS> {
 
 	@Override
 	boolean isEvaluable();
 
 	@Override
-	Epsilon containsAll(Type type);
+	Epsilon<?> containsAll(Type<?> type);
 
 	@Override
-	Epsilon intersetcs(Type type);
+	Epsilon<?> intersetcs(Type<?> type);
 
 	@Override
-	Type evaluate();
+	ElementType<? extends THIS> evaluate();
 
 	@Override
 	default MetaType<?, THIS> typeof() {
@@ -28,11 +27,7 @@ public interface ElementType<THIS extends ElementType<THIS>> extends Element<THI
 	Epsilon<?> isEqual(Thing<?> that);
 
 	@Override
-	Epsilon contains(Thing<?> thing);
-
-	@Override
-	ElementType cast(Thing thing);
-
+	Epsilon<?> contains(Thing<?> thing);
 
 
 }

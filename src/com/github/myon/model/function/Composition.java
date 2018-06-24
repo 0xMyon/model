@@ -9,44 +9,55 @@ import com.github.myon.model.type.FunctionType;
 
 public interface Composition<THIS extends Composition<THIS,DOMAIN,TYPE,CODOMAIN>, DOMAIN extends Thing<DOMAIN>, TYPE extends Thing<TYPE>, CODOMAIN extends Thing<CODOMAIN>> extends Function<THIS, DOMAIN, CODOMAIN> {
 
-	//Stream<? extends Function> elements();
-
 	Function<?,? super DOMAIN, ? extends TYPE> first();
 	Function<?,? super TYPE, ? extends CODOMAIN> second();
 
-
 	@Override
-	default Epsilon isEqual(final Thing that) {
-		return that.accept(new Thing.Visitor<Epsilon>() {
+	default Epsilon<?> isEqual(final Thing<?> that) {
+		return that.accept(new Thing.Visitor<Epsilon<?>>() {
 			@Override
-			public Epsilon handle(final Thing that) {
+			public Epsilon<?> handle(final Thing<?> that) {
 				return Nothing.of("unequal");
 			}
 			@Override
-			public Epsilon handle(final Composition<? super Thing,?,? extends Thing> that) {
+			public Epsilon<?> handle(final Composition<?,?,?,?> that) {
 				return Epsilon.Conjunction();
 			}
 		});
 	}
 
-	static <DOMAIN extends Thing, TYPE extends Thing, CODOMAIN extends Thing>
-	Function<? super DOMAIN, ? extends CODOMAIN>
-	of(final Function<? super DOMAIN, ? extends TYPE> first, final Function<? super TYPE, ? extends CODOMAIN> second) {
-		return new Composition<DOMAIN,TYPE,CODOMAIN>() {
+	interface Impl<DOMAIN extends Thing<DOMAIN>, TYPE extends Thing<TYPE>, CODOMAIN extends Thing<CODOMAIN>> extends Composition<Impl<DOMAIN,TYPE,CODOMAIN>, DOMAIN, TYPE, CODOMAIN> {
+		@Override
+		default public <T> T accept(final Visitor<T> visitor) {
+			return visitor.handle(this);
+		}
+		@Override
+		default public Impl<DOMAIN, TYPE, CODOMAIN> THIS() {
+			return this;
+		}
+		@Override
+		public default Impl<DOMAIN, TYPE, CODOMAIN> evaluate() {
+			return Composition.<DOMAIN,TYPE,CODOMAIN>of(
+					first().evaluate(),
+					second().evaluate()
+					);
+		}
+	}
+
+	static <DOMAIN extends Thing<DOMAIN>, TYPE extends Thing<TYPE>, CODOMAIN extends Thing<CODOMAIN>>
+	Impl<DOMAIN,TYPE,CODOMAIN>
+	of(final Function<?,? super DOMAIN, ? extends TYPE> first, final Function<?,? super TYPE, ? extends CODOMAIN> second) {
+		return new Impl<DOMAIN,TYPE,CODOMAIN>() {
 
 			@Override
-			public Function<? super DOMAIN, ? extends TYPE> first() {
+			public Function<?,? super DOMAIN, ? extends TYPE> first() {
 				return first;
 			}
 			@Override
-			public Function<? super TYPE, ? extends CODOMAIN> second() {
+			public Function<?,? super TYPE, ? extends CODOMAIN> second() {
 				return second;
 			}
 
-			@Override
-			public <T> T accept(final Visitor<T,DOMAIN,CODOMAIN> visitor) {
-				return visitor.handle(this);
-			}
 			@Override
 			public String toString() {
 				return first.toString()+"."+second.toString();
@@ -62,7 +73,7 @@ public interface Composition<THIS extends Composition<THIS,DOMAIN,TYPE,CODOMAIN>
 	}
 
 	@Override
-	default FunctionType typeof() {
+	default FunctionType<?> typeof() {
 		return FunctionType.of(
 				first().typeof().domain(), t -> second().typeof().codomain(first().typeof().codomain(t))
 				);
@@ -70,14 +81,12 @@ public interface Composition<THIS extends Composition<THIS,DOMAIN,TYPE,CODOMAIN>
 
 
 	@Override
-	public default Composition<THIS,DOMAIN,TYPE,CODOMAIN> evaluate() {
-		return Composition.of(first().evaluate(), second().evaluate());
-	}
+	public Composition<? extends THIS, ? super DOMAIN, TYPE, ? extends CODOMAIN> evaluate();
 
 
 	@Override
-	public default CODOMAIN evaluate(final Thing<? extends DOMAIN> parameter) {
-		return second().evaluate(first().evaluate(parameter));
+	public default Thing<? extends CODOMAIN> evaluate(final Thing<? extends DOMAIN> parameter) {
+		return first().evaluate(parameter).apply(second());
 	}
 
 
